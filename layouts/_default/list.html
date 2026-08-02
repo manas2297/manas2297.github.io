@@ -1,0 +1,37 @@
+{{ partial "head.html" . }}
+{{ partial "sidebar.html" . }}
+
+<div class="shell">
+    <header class="top-bar">
+        <p class="top-bar__tagline">{{ .Site.Params.topBarTagline }}</p>
+        <button type="button" class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="sidebar">
+            <span class="menu-btn__label">{{ .Site.Params.menuButtonLabel }}</span>
+            <span class="menu-btn__icon" aria-hidden="true">
+                <span></span><span></span><span></span>
+            </span>
+        </button>
+    </header>
+
+    <main class="main">
+        <section class="blog-hub reveal">
+            <h1 class="blog-hub__title">Writing & <span class="hero__accent">Insights</span></h1>
+            <p class="blog-hub__lede">Thoughts on building distributed backends, platform operations, and scalable developer tools.</p>
+
+            <div class="blog-grid">
+                {{ range .Pages }}
+                    <article class="blog-card">
+                        <div class="blog-card__meta">
+                            <span class="blog-card__date">{{ .Date.Format "Jan 2, 2006" }}</span>
+                            <span class="blog-card__read">{{ .ReadingTime }} min read</span>
+                        </div>
+                        <h2 class="blog-card__title">
+                            <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+                        </h2>
+                        <p class="blog-card__desc">{{ .Summary | truncate 160 }}</p>
+                        <a href="{{ .RelPermalink }}" class="blog-card__link">Read article <i class="fa-solid fa-arrow-right-long"></i></a>
+                    </article>
+                {{ end }}
+            </div>
+        </section>
+    </main>
+{{ partial "footer.html" . }}

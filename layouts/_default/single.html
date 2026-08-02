@@ -1,0 +1,43 @@
+{{ partial "head.html" . }}
+{{ partial "sidebar.html" . }}
+
+<div class="shell">
+    <header class="top-bar">
+        <p class="top-bar__tagline">{{ .Site.Params.topBarTagline }}</p>
+        <button type="button" class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="sidebar">
+            <span class="menu-btn__label">{{ .Site.Params.menuButtonLabel }}</span>
+            <span class="menu-btn__icon" aria-hidden="true">
+                <span></span><span></span><span></span>
+            </span>
+        </button>
+    </header>
+
+    <main class="main main--single">
+        <article class="post-detail reveal">
+            <a href="{{ "/" | relURL }}" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to home</a>
+            
+            <header class="post-detail__header">
+                {{ if .Params.category }}
+                    <span class="post-detail__cat">{{ .Params.category }}</span>
+                {{ end }}
+                <h1 class="post-detail__title">{{ .Title }}</h1>
+                <div class="post-detail__meta">
+                    {{ if not .Date.IsZero }}
+                        <span class="post-detail__meta-item"><i class="fa-regular fa-calendar"></i> {{ .Date.Format "Jan 2, 2006" }}</span>
+                    {{ end }}
+                    <span class="post-detail__meta-item"><i class="fa-regular fa-clock"></i> {{ .ReadingTime }} min read</span>
+                </div>
+            </header>
+
+            {{ if .Params.image }}
+                <div class="post-detail__hero-wrap">
+                    <img src="{{ .Params.image | relURL }}" alt="{{ .Title }}" class="post-detail__hero-img">
+                </div>
+            {{ end }}
+
+            <div class="post-detail__content">
+                {{ .Content }}
+            </div>
+        </article>
+    </main>
+{{ partial "footer.html" . }}

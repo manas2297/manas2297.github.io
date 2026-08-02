@@ -1,0 +1,78 @@
+baseURL = 'https://manas2297.github.io/portfolio/'
+locale = 'en-us'
+title = 'Manas Yadav'
+
+[markup]
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true # Allow HTML tags in markdown files (e.g. alignment divs, icons)
+  [markup.highlight]
+    codeFences = true
+    guessSyntax = true
+    lineNos = false
+    style = 'monokai' # Beautiful default code highlighter theme
+
+[params]
+  description = 'GitHub-first portfolio for Manas Yadav: distributed systems, open source work, and architecture case studies.'
+  sidebarTitle = 'Manas'
+  sidebarSubtitle = 'code v2.0'
+  verticalWatermark = 'Systems since 2019, Build · Scale · Ship'
+  established = 'Est. 2019'
+  topBarTagline = 'Manas Yadav'
+  menuButtonLabel = 'Menu'
+  copyrightLine = '© 2026 · Manas'
+
+  [params.hero]
+    eyebrow = 'Open Source & Platform Engineer'
+    lede = 'I design and ship high-throughput systems, cloud-native platforms, and practical developer tooling. This page highlights production architecture wins and open-source code you can verify directly on GitHub.'
+    ctaLabel = 'Explore featured work'
+    ctaHref = '#works'
+    portraitSrc = 'img/hero2.png'
+    portraitAlt = 'Manas Yadav - Senior Software Architect'
+
+  [params.philosophy]
+    heading = 'The philosophy of structural intelligence'
+    pullquote = 'Velocity gets attention, but reliability earns trust. The best architecture scales both product ambition and operational confidence.'
+
+  [params.contact]
+    eyebrow = 'Connect'
+    title = "Let's build dependable systems"
+    availabilityPrefix = 'Availability:'
+    availabilityMessage = 'open to senior backend, platform, and architecture opportunities'
+    legal = 'Share your context and I will respond with a practical plan.'
+
+[[menu.main]]
+  name = 'Welcome'
+  url = '/#welcome'
+  weight = 10
+  pre = 'fa-house'
+
+[[menu.main]]
+  name = 'Works'
+  url = '/#works'
+  weight = 20
+  pre = 'fa-briefcase'
+
+[[menu.main]]
+  name = 'About'
+  url = '/#about'
+  weight = 30
+  pre = 'fa-user'
+
+[[menu.main]]
+  name = 'Skills'
+  url = '/#skills'
+  weight = 40
+  pre = 'fa-bolt'
+
+[[menu.main]]
+  name = 'Blog'
+  url = '/posts/'
+  weight = 50
+  pre = 'fa-newspaper'
+
+[[menu.main]]
+  name = 'Contact'
+  url = '/#contact'
+  weight = 60
+  pre = 'fa-paper-plane'

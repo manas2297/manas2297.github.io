@@ -1,0 +1,18 @@
+    <div class="nav-overlay" id="nav-overlay" aria-hidden="true"></div>
+
+    <aside class="sidebar" id="sidebar" aria-label="Primary">
+        <a href="{{ "/" | relURL }}" class="sidebar-brand">
+            <span class="sidebar-brand__title">{{ .Site.Params.sidebarTitle }}</span>
+            <span class="sidebar-brand__meta">{{ .Site.Params.sidebarSubtitle }}</span>
+        </a>
+        <nav class="sidebar-nav" id="sidebar-nav">
+            {{ range .Site.Menus.main }}
+                <a href="{{ .URL }}" class="sidebar-link">
+                    <i class="fa-solid {{ .Pre }}" aria-hidden="true"></i>
+                    <span>{{ .Name }}</span>
+                </a>
+            {{ end }}
+        </nav>
+        <p class="sidebar-watermark" id="brand-watermark" aria-hidden="true">{{ .Site.Params.verticalWatermark }}</p>
+        <p class="sidebar-est" id="brand-est">{{ .Site.Params.established }}</p>
+    </aside>
