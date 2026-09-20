@@ -1,41 +1,62 @@
-# Manas Yadav - GitHub Profile Showcase
+# Manas Yadav - Portfolio Site
 
-This repository powers a lightweight portfolio site intended for GitHub Pages.
+This repository powers a lightweight portfolio site built with [Hugo](https://gohugo.io/).
+
+## Prerequisites
+
+Install Hugo on your machine:
+
+- **macOS (Homebrew):** `brew install hugo`
+- **Linux:** `sudo apt install hugo` or use your package manager
+- **Windows:** `choco install hugo-extended`
+
+## Local Development
+
+Start the Hugo development server:
+
+```bash
+hugo server -D
+```
+
+Then open your browser at:
+
+- `http://localhost:1313/portfolio/`
+
+> **Note:** If you want to preview without the `/portfolio/` subpath locally, run:
+> ```bash
+> hugo server --baseURL http://localhost:1313/
+> ```
+> then open `http://localhost:1313/`.
+
+### Alternative: Static HTML preview with Python
+
+If you prefer building static HTML and previewing via Python:
+
+```bash
+hugo
+cd public
+python3 -m http.server 8000
+```
+
+Then open: `http://localhost:8000`
 
 ## Deploy on GitHub Pages
 
+Because this site uses Hugo templates, GitHub Pages needs to build the site using GitHub Actions:
+
 1. Push this repository to GitHub.
-2. Open repository settings.
-3. Go to **Pages**.
-4. Under **Build and deployment**:
-   - Source: `Deploy from a branch`
-   - Branch: `main` (or your default branch)
-   - Folder: `/ (root)`
-5. Save and wait for deployment.
+2. Go to **Settings** > **Pages** in your GitHub repository.
+3. Under **Build and deployment**:
+   - Set **Source** to **GitHub Actions**.
+4. Select the standard **Hugo** GitHub Actions workflow (or create `.github/workflows/hugo.yml`).
 
-Your site will be available at:
+Your site will automatically build and deploy to:
 
-- `https://<username>.github.io/<repository-name>/`
+- `https://manas2297.github.io/portfolio/`
 
-If this repository is named `<username>.github.io`, then it will be available at:
+## Optional: GitHub Profile README
 
-- `https://<username>.github.io/`
-
-## Local preview
-
-Run a local server from this folder:
-
-```bash
-python3 -m http.server
-```
-
-Then open:
-
-- `http://localhost:8000`
-
-## Optional: GitHub profile README
-
-To customize your GitHub profile page (`https://github.com/<username>`), create a **separate** repository named exactly your username (for example: `manas2297`) and add a `README.md`.
+To customize your GitHub profile page (`https://github.com/manas2297`), create a **separate** repository named `manas2297` with a `README.md`.
 
 Starter example:
 
@@ -59,3 +80,4 @@ Platform-focused engineer building distributed systems, cloud-native architectur
 - GitHub: [@manas2297](https://github.com/manas2297)
 - LinkedIn: [in/manas2297](https://www.linkedin.com/in/manas2297)
 ```
+

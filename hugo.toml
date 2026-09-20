@@ -13,22 +13,26 @@ title = 'Manas Yadav'
     style = 'monokai' # Beautiful default code highlighter theme
 
 [params]
-  description = 'GitHub-first portfolio for Manas Yadav: distributed systems, open source work, and architecture case studies.'
-  sidebarTitle = 'Manas'
-  sidebarSubtitle = 'code v2.0'
-  verticalWatermark = 'Systems since 2019, Build · Scale · Ship'
-  established = 'Est. 2019'
-  topBarTagline = 'Manas Yadav'
+  description = 'Professional portfolio for Manas Yadav: distributed systems, cloud infrastructure, and enterprise architecture case studies.'
+  email = 'devxlog@zohomail.in'
+  headerRole = 'Lead Engineer'
+  headerCtaLabel = 'Email me'
+  availabilityBadge = 'Open to lead, staff, and principal engineering roles'
   menuButtonLabel = 'Menu'
-  copyrightLine = '© 2026 · Manas'
+  copyrightLine = '© 2026 Manas Yadav'
 
   [params.hero]
-    eyebrow = 'Open Source & Platform Engineer'
-    lede = 'I design and ship high-throughput systems, cloud-native platforms, and practical developer tooling. This page highlights production architecture wins and open-source code you can verify directly on GitHub.'
-    ctaLabel = 'Explore featured work'
-    ctaHref = '#works'
-    portraitSrc = 'img/hero2.png'
-    portraitAlt = 'Manas Yadav - Senior Software Architect'
+    headline = 'Lead Engineer · Distributed systems & cloud platforms'
+    lede = 'I architect high-throughput distributed backends and event-driven systems that scale 10x–100x — transforming complex infrastructure into cost-efficient, high-reliability platforms that directly accelerate business growth.'
+    ctaPrimary = 'Get in touch'
+    ctaSecondary = 'View case studies'
+    portraitSrc = 'img/hero.png'
+    portraitAlt = 'Manas Yadav — Lead Engineer'
+    proofPoints = [
+      '7+ years building scalable backends',
+      '10x–100x system scaling & cost optimization',
+      'Architecture from startups to global platforms',
+    ]
 
   [params.philosophy]
     heading = 'The philosophy of structural intelligence'
@@ -38,7 +42,7 @@ title = 'Manas Yadav'
     eyebrow = 'Connect'
     title = "Let's build dependable systems"
     availabilityPrefix = 'Availability:'
-    availabilityMessage = 'open to senior backend, platform, and architecture opportunities'
+    availabilityMessage = 'open to lead backend, distributed systems, and staff engineering roles'
     legal = 'Share your context and I will respond with a practical plan.'
 
 [[menu.main]]
@@ -48,22 +52,22 @@ title = 'Manas Yadav'
   pre = 'fa-house'
 
 [[menu.main]]
-  name = 'Works'
-  url = '/#works'
-  weight = 20
-  pre = 'fa-briefcase'
-
-[[menu.main]]
   name = 'About'
   url = '/#about'
-  weight = 30
+  weight = 20
   pre = 'fa-user'
 
 [[menu.main]]
-  name = 'Skills'
-  url = '/#skills'
+  name = 'Experience'
+  url = '/#experience'
+  weight = 30
+  pre = 'fa-briefcase'
+
+[[menu.main]]
+  name = 'Works'
+  url = '/#works'
   weight = 40
-  pre = 'fa-bolt'
+  pre = 'fa-diagram-project'
 
 [[menu.main]]
   name = 'Blog'

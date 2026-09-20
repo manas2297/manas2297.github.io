@@ -1,0 +1,78 @@
+/* ==========================================================================
+   ABOUT SECTION
+   ========================================================================== */
+
+.about {
+    padding: 3.5rem 0;
+    border-top: 1px solid var(--border);
+}
+
+.about__grid {
+    display: grid;
+    grid-template-columns: 1.4fr 0.9fr;
+    gap: 2.5rem;
+    align-items: start;
+}
+
+.about__copy {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    color: var(--muted);
+    font-size: 1rem;
+    line-height: 1.7;
+}
+
+.about__aside {
+    padding: 1.5rem;
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    border: 1px solid var(--border);
+}
+
+.about__aside-title {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-heading);
+    margin-bottom: 1rem;
+}
+
+.about__list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.about__list li {
+    font-size: 0.9375rem;
+    color: var(--muted);
+    padding-left: 1.1rem;
+    position: relative;
+}
+
+.about__list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 6px;
+    height: 6px;
+    border-radius: 2px;
+    background: var(--accent);
+}
+
+/* Legacy portrait styles (blog / older partials) */
+.hero__frame {
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    background: var(--surface);
+}
+
+.hero__img {
+    display: block;
+    width: 100%;
+    height: auto;
+}

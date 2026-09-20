@@ -1,21 +1,11 @@
 {{ partial "head.html" . }}
-{{ partial "sidebar.html" . }}
+{{ partial "header.html" . }}
 
-<div class="shell">
-    <header class="top-bar">
-        <p class="top-bar__tagline">{{ .Site.Params.topBarTagline }}</p>
-        <button type="button" class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="sidebar">
-            <span class="menu-btn__label">{{ .Site.Params.menuButtonLabel }}</span>
-            <span class="menu-btn__icon" aria-hidden="true">
-                <span></span><span></span><span></span>
-            </span>
-        </button>
-    </header>
-
+<div class="page-wrap">
     <main class="main">
         <section class="blog-hub reveal">
-            <h1 class="blog-hub__title">Writing & <span class="hero__accent">Insights</span></h1>
-            <p class="blog-hub__lede">Thoughts on building distributed backends, platform operations, and scalable developer tools.</p>
+            <h1 class="blog-hub__title">Writing & <span class="text-accent">insights</span></h1>
+            <p class="blog-hub__lede">Notes on distributed backends, platform operations, and scalable developer tools.</p>
 
             <div class="blog-grid">
                 {{ range .Pages }}

@@ -1,9 +1,9 @@
 ---
-title: "CoinDCX Cross-Region Kafka Migration"
+title: "Zero-Downtime Cross-Region Kafka Migration"
 date: 2026-08-01
 category: "Platform Case Study"
 tag: "Distributed Systems Backbone"
-image: "img/coindcx_kafka.png"
+image: "img/kafka_migration.png"
 role: "Platform Engineer"
 scale: "15M+ Users"
 impact: "250ms → < 10ms Latency"
@@ -12,7 +12,7 @@ description: "Led cross-region migration of a mission-critical Kafka backbone fo
 
 ## The Context
 
-CoinDCX is India's largest cryptocurrency exchange, handling billions in daily trading volume. At the heart of our platform is a massive, highly-available Kafka cluster that serves as the central nervous system for all events—powering everything from live trade executions to real-time pricing updates for millions of users.
+At a premier cryptocurrency exchange handling billions in daily trading volume, a massive, highly-available Kafka cluster serves as the central nervous system for all events—powering everything from live trade executions to real-time pricing updates for millions of users.
 
 As the platform grew exponentially, our existing regional infrastructure became a bottleneck. Network latency between microservices and our primary data center began hovering around 250ms, which is unacceptable in high-frequency trading environments.
 
@@ -46,4 +46,4 @@ The migration was an absolute success, executed cleanly with zero impact on live
 
 *   **Latency Slashed**: Publish and consume latency dropped dramatically from **250ms down to under 10ms**.
 *   **System Stability**: Drastically improved order execution speeds, reducing slippage for users during volatile market conditions.
-*   **Architectural Resilience**: Established a battle-tested playbook for active-active multi-region disaster recovery for CoinDCX's core infrastructure.
+*   **Architectural Resilience**: Established a battle-tested playbook for active-active multi-region disaster recovery for the exchange's core trading infrastructure.

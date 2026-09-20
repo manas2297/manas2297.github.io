@@ -1,13 +1,16 @@
-        <footer class="site-footer reveal">
-            <p class="site-footer__copy">{{ .Site.Params.copyrightLine }}</p>
-            <div class="site-footer__social" id="footer-social">
-                <a href="https://github.com/manas2297" target="_blank" rel="noopener noreferrer">GitHub</a>
-                <a href="https://www.linkedin.com/in/manas2297" target="_blank" rel="noopener noreferrer">LinkedIn</a>
-                <a href="https://github.com/manas2297/GoKafkaToolkit" target="_blank" rel="noopener noreferrer">GoKafkaToolkit</a>
-            </div>
-        </footer>
-    </div>
+    <footer class="site-footer reveal">
+        <p class="site-footer__copy">{{ .Site.Params.copyrightLine }}</p>
+        <div class="site-footer__social" id="footer-social">
+            <a href="https://github.com/manas2297" target="_blank" rel="noopener noreferrer">GitHub</a>
+            <a href="https://www.linkedin.com/in/manas2297" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+            <a href="mailto:{{ .Site.Params.email }}">Email</a>
+        </div>
+    </footer>
+</div>
 
-    <script src="{{ "js/main.js" | relURL }}"></script>
+    <!-- Motion One (Framer Motion engine for vanilla JS / static sites) -->
+    <script src="https://cdn.jsdelivr.net/npm/motion@10.16.4/dist/motion.umd.js"></script>
+    <script src="{{ "js/main.js" | relURL }}?v=3.2"></script>
+    {{ if .Params.extraJS }}<script src="{{ .Params.extraJS | relURL }}"></script>{{ end }}
 </body>
 </html>

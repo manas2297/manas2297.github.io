@@ -1,318 +1,189 @@
 {{ partial "head.html" . }}
-{{ partial "sidebar.html" . }}
+{{ partial "header.html" . }}
 
-<div class="shell">
-    <header class="top-bar">
-        <p class="top-bar__tagline">{{ .Site.Params.topBarTagline }}</p>
-        <button type="button" class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="sidebar">
-            <span class="menu-btn__label">{{ .Site.Params.menuButtonLabel }}</span>
-            <span class="menu-btn__icon" aria-hidden="true">
-                <span></span><span></span><span></span>
-            </span>
-        </button>
-    </header>
-
+<div class="page-wrap">
     <main class="main">
-        <!-- 1. Hero Section -->
-        <section class="hero reveal" id="welcome">
+        <section class="hero" id="welcome" aria-label="Introduction">
+            <div class="hero__ambient" aria-hidden="true">
+                <span class="hero__orb hero__orb--1"></span>
+                <span class="hero__orb hero__orb--2"></span>
+            </div>
             <div class="hero__grid">
-                <div class="hero__copy">
-                    <p class="eyebrow">{{ .Site.Params.hero.eyebrow }}</p>
-                    <h1 class="hero__title">
-                        Building <span class="hero__accent">reliable systems</span><br>for real-world scale.
-                    </h1>
+                <div class="hero__content">
+                    <p class="hero__availability">
+                        <span class="hero__availability-dot" aria-hidden="true"></span>
+                        {{ .Site.Params.availabilityBadge }}
+                    </p>
+                    <h1 class="hero__title">Manas Yadav</h1>
+                    <p class="hero__headline">{{ .Site.Params.hero.headline }}</p>
                     <p class="hero__lede">{{ .Site.Params.hero.lede }}</p>
-                    <a href="{{ .Site.Params.hero.ctaHref }}" class="btn-indigo">{{ .Site.Params.hero.ctaLabel }}</a>
+
+                    <ul class="hero__proof" aria-label="Career highlights">
+                        {{ range .Site.Params.hero.proofPoints }}
+                        <li>{{ . }}</li>
+                        {{ end }}
+                    </ul>
+
+                    <div class="hero__actions">
+                        <a href="#contact" class="btn btn--primary">{{ .Site.Params.hero.ctaPrimary }}</a>
+                        <a href="#works" class="btn btn--ghost">{{ .Site.Params.hero.ctaSecondary }}</a>
+                    </div>
+
+                    <div class="hero__social">
+                        <a href="https://github.com/manas2297" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+                        <a href="https://www.linkedin.com/in/manas2297" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+                        <a href="mailto:{{ .Site.Params.email }}" aria-label="Email"><i class="fa-solid fa-envelope"></i></a>
+                    </div>
                 </div>
+
                 <div class="hero__visual">
-                    <div class="hero__frame">
-                        <img src="{{ .Site.Params.hero.portraitSrc | relURL }}" alt="{{ .Site.Params.hero.portraitAlt }}" class="hero__img" width="520" height="700" loading="eager">
+                    <div class="hero__portrait">
+                        <img src="{{ .Site.Params.hero.portraitSrc | relURL }}" alt="{{ .Site.Params.hero.portraitAlt }}" width="420" height="520" loading="eager">
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- 2. Showcase / Works Section (Moved upfront) -->
-        <section class="showcase reveal" id="works" aria-labelledby="showcase-heading">
-            <div class="showcase__bg" aria-hidden="true">
-                <span class="showcase__watermark showcase__watermark--works">Works</span>
-                <span class="showcase__watermark showcase__watermark--kinetic">Production outcomes</span>
-            </div>
-            <div class="showcase__inner">
-                <header class="showcase__header">
-                    <h2 id="showcase-heading" class="showcase__title">Featured projects <br><span class="hero__accent">from my journey</span></h2>
-                </header>
-                
-                <div class="showcase-grid">
-                    <!-- Fetch dynamic works -->
-                    {{ range (where .Site.RegularPages "Section" "works") }}
-                    <article class="proj-card proj-card--feature">
-                        <div class="proj-card__visual">
-                            <img src="{{ .Params.image | relURL }}" alt="{{ .Title }}" class="proj-card__img" loading="lazy">
-                        </div>
-                        <div class="proj-card__copy">
-                            <span class="proj-card__tag">{{ .Params.tag }}</span>
-                            <h3 class="proj-card__title">{{ .Title }}</h3>
-                            <p class="proj-card__desc">{{ .Params.description }}</p>
-                            <a href="{{ .RelPermalink }}" class="proj-card__link">View case study <i class="fa-solid fa-arrow-right-long"></i></a>
-                        </div>
-                    </article>
-                    {{ end }}
-
-                    <!-- Static extra cards/links -->
-                    <article class="proj-card proj-card--compact">
-                        <div class="proj-card__visual">
-                            <img src="{{ "img/zero_trust.png" | relURL }}" alt="Security" class="proj-card__img" loading="lazy">
-                        </div>
-                        <div class="proj-card__copy">
-                            <span class="proj-card__tag">Security Architecture</span>
-                            <h3 class="proj-card__title">Zero Trust Access Blueprint</h3>
-                            <p class="proj-card__desc">A practical security blueprint for implementing least-privilege, auditable access, and safer service-to-service communication.</p>
-                            <a href="https://github.com/manas2297" target="_blank" rel="noopener noreferrer" class="proj-card__link">View GitHub profile <i class="fa-solid fa-arrow-right-long"></i></a>
-                        </div>
-                    </article>
-
-                    <article class="proj-card proj-card--compact">
-                        <div class="proj-card__visual">
-                            <img src="{{ "img/ci_cd.png" | relURL }}" alt="Toolkit" class="proj-card__img" loading="lazy">
-                        </div>
-                        <div class="proj-card__copy">
-                            <span class="proj-card__tag">Open Source / Go</span>
-                            <h3 class="proj-card__title">GoKafkaToolkit</h3>
-                            <p class="proj-card__desc">Open-source Go toolkit that streamlines Kafka producers and consumers across local, cloud, and Confluent environments.</p>
-                            <a href="https://github.com/manas2297/GoKafkaToolkit" target="_blank" rel="noopener noreferrer" class="proj-card__link">Open repository <i class="fa-solid fa-arrow-right-long"></i></a>
-                        </div>
-                    </article>
-
-                    <article class="proj-card proj-card--split">
-                        <div class="proj-card__copy">
-                            <h3 class="proj-card__title">Explore all repositories, contributions, and activity</h3>
-                            <a href="https://github.com/manas2297" target="_blank" rel="noopener noreferrer" class="btn-indigo">View full GitHub profile</a>
-                        </div>
-                        <div class="proj-card__visual">
-                            <img src="{{ "img/ai_infrastructure.png" | relURL }}" alt="Infra" class="proj-card__img" loading="lazy">
-                        </div>
-                    </article>
-                </div>
-            </div>
-        </section>
-
-        <!-- 3. Skills & Experience Hub -->
-        <section class="skills-hub reveal" id="skills" aria-labelledby="skills-heading">
-            <div class="skills-hub__accent-rule" aria-hidden="true"></div>
-            
-            <!-- Professional Journey (Prioritized above skill rings) -->
-            <div class="journey" style="border-top: none; padding-top: 0;">
-                <div class="journey__header">
-                    <h2 id="skills-heading" class="journey__title" style="font-size: 2.5rem; margin-bottom: 1rem;">Professional <span class="hero__accent">journey</span></h2>
-                    <p class="journey__lede">Engineering across startups and scale-ups, focused on resilient backend systems, platform foundations, and measurable business impact.</p>
-                </div>
-                <ol class="journey__list">
-                    <li class="journey-item">
-                        <span class="journey-item__date">2021 – Now</span>
-                        <div class="journey-item__content">
-                            <h4 class="journey-item__role">Principal Solutions Architect <span class="journey-item__loc">Nexus Dynamics Global</span></h4>
-                            <p class="journey-item__desc">Leading architecture for mission-critical platforms, including high-throughput distributed systems, reliability strategy, and platform scalability.</p>
-                        </div>
-                    </li>
-                    <li class="journey-item">
-                        <span class="journey-item__date">2020 – 2021</span>
-                        <div class="journey-item__content">
-                            <h4 class="journey-item__role">Full Stack Developer <span class="journey-item__loc">Somnoware Healthcare Systems</span></h4>
-                            <p class="journey-item__desc">Built core product and platform capabilities for a healthcare system focused on sleep disorder diagnosis and treatment workflows.</p>
-                        </div>
-                    </li>
-                    <li class="journey-item">
-                        <span class="journey-item__date">2019 – 2020</span>
-                        <div class="journey-item__content">
-                            <h4 class="journey-item__role">Full Stack Developer <span class="journey-item__loc">CronJ IT Technologies</span></h4>
-                            <p class="journey-item__desc">Delivered product features while helping transition monolithic services toward maintainable, service-oriented architecture patterns.</p>
-                        </div>
-                    </li>
-                </ol>
-            </div>
-
-            <!-- Technical Capabilities (Skill Rings) -->
-            <h3 class="journey__title" style="margin-top: 5rem; margin-bottom: 2.5rem;">Core technical capabilities</h3>
-            <div class="skill-rings" role="list">
-                <div class="ring-card" role="listitem">
-                    <div class="ring-card__circle" style="--percent: 95;">
-                        <svg><circle cx="50" cy="50" r="45"></circle><circle cx="50" cy="50" r="45"></circle></svg>
-                        <span class="ring-card__num">95%</span>
-                    </div>
-                    <h3 class="ring-card__label">Distributed systems</h3>
-                    <p class="ring-card__sub">Kafka / event-driven / high-availability</p>
-                </div>
-                <div class="ring-card" role="listitem">
-                    <div class="ring-card__circle" style="--percent: 91;">
-                        <svg><circle cx="50" cy="50" r="45"></circle><circle cx="50" cy="50" r="45"></circle></svg>
-                        <span class="ring-card__num">91%</span>
-                    </div>
-                    <h3 class="ring-card__label">Go and backend</h3>
-                    <p class="ring-card__sub">Concurrent services / API design</p>
-                </div>
-                <div class="ring-card" role="listitem">
-                    <div class="ring-card__circle" style="--percent: 92;">
-                        <svg><circle cx="50" cy="50" r="45"></circle><circle cx="50" cy="50" r="45"></circle></svg>
-                        <span class="ring-card__num">92%</span>
-                    </div>
-                    <h3 class="ring-card__label">Cloud native</h3>
-                    <p class="ring-card__sub">Kubernetes / infra automation</p>
-                </div>
-            </div>
-
-            <!-- GitHub Signals & Stats -->
-            <div class="credentials-box">
-                <div class="credentials">
-                    <h3 class="credentials__heading">GitHub Signals</h3>
-                    <div class="credentials__grid">
-                        <div class="cred-card">
-                            <i class="fa-solid fa-code-branch cred-card__icon"></i>
-                            <h4 class="cred-card__title">63+ public repositories</h4>
-                        </div>
-                        <div class="cred-card">
-                            <i class="fa-solid fa-star cred-card__icon"></i>
-                            <h4 class="cred-card__title">26+ stars on public projects</h4>
-                        </div>
-                        <div class="cred-card">
-                            <i class="fa-solid fa-users cred-card__icon"></i>
-                            <h4 class="cred-card__title">Growing open-source network</h4>
-                        </div>
-                    </div>
-                </div>
-                <div class="skills-stats" aria-label="Career metrics">
-                    <div class="stat-item">
-                        <span class="stat-item__num" data-target="63">0</span><span class="stat-item__suffix">+</span>
-                        <span class="stat-item__label">Public repositories</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-item__num" data-target="26">0</span><span class="stat-item__suffix">+</span>
-                        <span class="stat-item__label">GitHub stars</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-item__num" data-target="8">0</span><span class="stat-item__suffix">+</span>
-                        <span class="stat-item__label">Followers</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 4. Philosophy & Services Section -->
-        <section class="philosophy-block reveal" id="about" aria-labelledby="philosophy-heading">
-            <div class="philosophy-block__grid">
-                <div class="philosophy-block__text">
-                    <h2 id="philosophy-heading" class="section-head">The <span class="hero__accent">philosophy</span> of structural intelligence</h2>
-                    <p>My core principle is simple: software should scale in traffic, team size, and complexity without losing reliability. I focus on clear boundaries, event-driven design, and operational visibility from day one.</p>
-                    <p>I have built across healthcare, fintech, and B2B ecosystems, with work ranging from migration of critical Kafka backbones to developer-focused libraries in Go. The goal stays the same: measurable outcomes, not buzzwords.</p>
-                    <blockquote class="pullquote">
-                        {{ .Site.Params.philosophy.pullquote }}
-                    </blockquote>
-                </div>
-                <div class="service-grid" id="services">
-                    <div class="service-card">
-                        <span class="service-card__num">01</span>
-                        <h3 class="service-card__title">Distributed Systems</h3>
-                        <p class="service-card__desc">High-throughput event processing, fault tolerance patterns, and reliable service-to-service communication.</p>
-                    </div>
-                    <div class="service-card">
-                        <span class="service-card__num">02</span>
-                        <h3 class="service-card__title">Cloud Architecture</h3>
-                        <p class="service-card__desc">Production-ready cloud topologies with scale, resilience, and cost-awareness built into the design.</p>
-                    </div>
-                    <div class="service-card">
-                        <span class="service-card__num">03</span>
-                        <h3 class="service-card__title">Developer Tooling</h3>
-                        <p class="service-card__desc">Practical tooling and reusable frameworks that improve delivery speed and engineering quality.</p>
-                    </div>
-                    <div class="service-card">
-                        <span class="service-card__num">04</span>
-                        <h3 class="service-card__title">Platform Infra</h3>
-                        <p class="service-card__desc">Kubernetes, CI/CD, and service observability foundations for sustained platform growth.</p>
-                    </div>
-                    <div class="service-card">
-                        <span class="service-card__num">05</span>
-                        <h3 class="service-card__title">Architecture Reviews</h3>
-                        <p class="service-card__desc">Reducing technical debt and improving long-term maintainability through pragmatic refactoring strategy.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 5. Marquee Row -->
-        <div class="marquee reveal" aria-hidden="true">
-            <div class="marquee__track">
-                <span>Distributed Systems</span> • 
-                <span class="hero__accent">Kubernetes</span> • 
-                <span>Open Source</span> • 
-                <span class="hero__accent">Cloud Native</span> • 
-                <span>Kafka</span> • 
-                <span class="hero__accent">Platform Design</span> • 
-                <span>Go</span> •
-                <span>Distributed Systems</span> • 
-                <span class="hero__accent">Kubernetes</span> • 
-                <span>Open Source</span> • 
-                <span class="hero__accent">Cloud Native</span> • 
-                <span>Kafka</span> • 
-                <span class="hero__accent">Platform Design</span> • 
-                <span>Go</span>
-            </div>
-        </div>
-
-        <!-- 6. Contact Section -->
-        <section class="contact-protocol reveal" id="contact" aria-labelledby="contact-heading">
-            <header class="contact-protocol__header">
-                <p class="contact-protocol__eyebrow">{{ .Site.Params.contact.eyebrow }}</p>
-                <h2 id="contact-heading" class="contact-protocol__title">{{ .Site.Params.contact.title }}</h2>
-                <div class="contact-protocol__underline" aria-hidden="true"></div>
+        <section class="about scroll-reveal" id="about" aria-labelledby="about-heading">
+            <header class="section-header section-header--compact">
+                <p class="eyebrow">About</p>
+                <h2 id="about-heading" class="section-title">Engineering scale with <span class="text-accent">business impact</span></h2>
             </header>
 
-            <div class="contact-protocol__grid">
-                <div class="contact-direct">
-                    <div class="contact-direct__item">
-                        <i class="fa-brands fa-github contact-direct__icon"></i>
-                        <div>
-                            <span class="contact-direct__label">GitHub</span>
-                            <a href="https://github.com/manas2297" class="contact-direct__val">@manas2297</a>
-                        </div>
-                    </div>
-                    <div class="contact-direct__item">
-                        <i class="fa-brands fa-linkedin contact-direct__icon"></i>
-                        <div>
-                            <span class="contact-direct__label">LinkedIn</span>
-                            <a href="https://www.linkedin.com/in/manas2297" class="contact-direct__val">in/manas2297</a>
-                        </div>
-                    </div>
-                    <div class="contact-direct__item">
-                        <i class="fa-solid fa-code contact-direct__icon"></i>
-                        <div>
-                            <span class="contact-direct__label">Core stack</span>
-                            <span class="contact-direct__val">Go | Node.js | Kubernetes</span>
-                        </div>
-                    </div>
-                    <div class="contact-avail">
-                        <span class="contact-avail__prefix">{{ .Site.Params.contact.availabilityPrefix }}</span>
-                        <span class="contact-avail__msg">{{ .Site.Params.contact.availabilityMessage }}</span>
-                    </div>
+            <div class="about__grid">
+                <div class="about__copy">
+                    <p>Over my years in backend and platform engineering across <strong>HealthTech, FinTech, and SaaS</strong>, I’ve navigated diverse domains and built systems both from scratch and at massive throughput. My focus bridges deep technical execution with clear business outcomes — scaling backend architectures from <strong>10x to 100x</strong>, optimizing cloud spend to bring down system costs, and turning fragile services into bulletproof operations.</p>
+                    <p>As a senior developer and technical lead, I look at systems proactively with a keen eye for architectural bottlenecks before they turn into outages. I’ve guided engineering teams through the intense challenges of high-growth startups, placing high value on mentoring developers, elevating engineering standards, and building resilient platforms that drive long-term business value.</p>
+                    <blockquote class="pullquote">{{ .Site.Params.philosophy.pullquote }}</blockquote>
                 </div>
+                <aside class="about__aside" aria-label="What I help teams with">
+                    <h3 class="about__aside-title">Where I add value</h3>
+                    <ul class="about__list">
+                        <li>10x–100x system scaling & performance optimization</li>
+                        <li>Infrastructure cost reduction & cloud efficiency</li>
+                        <li>Engineering leadership, mentoring & team growth</li>
+                        <li>Fault-tolerant distributed & event-driven systems</li>
+                    </ul>
+                </aside>
+            </div>
+        </section>
 
-                <div class="contact-form-wrap">
-                    <form action="#" method="post" class="contact-form">
-                        <div class="form-group">
-                            <label for="form-name">Full name</label>
-                            <input type="text" id="form-name" name="name" placeholder="John Doe" required>
+        <section class="experience scroll-reveal" id="experience" aria-labelledby="experience-heading">
+            <header class="section-header">
+                <p class="eyebrow">Background</p>
+                <h2 id="experience-heading" class="section-title">Experience & <span class="text-accent">expertise</span></h2>
+            </header>
+
+            <ol class="journey__list">
+                <li class="journey-item">
+                    <span class="journey-item__date">2024 – Present</span>
+                    <div class="journey-item__content">
+                        <h3 class="journey-item__role">Lead Engineer <span class="journey-item__loc">HighLevel India Pvt Ltd</span></h3>
+                        <p class="journey-item__desc">Feb 2024 – Present · Leading distributed backend systems architecture, platform reliability, and high-throughput infrastructure scaling. Mentoring engineering teams and driving technical strategy through high-growth scale.</p>
+                    </div>
+                </li>
+                <li class="journey-item">
+                    <span class="journey-item__date">2021 – 2024</span>
+                    <div class="journey-item__content">
+                        <h3 class="journey-item__role">Software Development Engineer III <span class="journey-item__loc">CoinDCX</span></h3>
+                        <p class="journey-item__desc">Apr 2021 – Feb 2024 · Rapid progression from SDE 1 (Apr 2021 – Apr 2022) → SDE 2 (Apr 2022 – Apr 2023) → SDE 3 (Apr 2023 – Feb 2024). Spearheaded core trading backbone systems, led cross-region zero-downtime Kafka migration (cutting latency from 250ms to &lt;10ms), and scaled infrastructure for 15M+ users.</p>
+                    </div>
+                </li>
+                <li class="journey-item">
+                    <span class="journey-item__date">2020 – 2021</span>
+                    <div class="journey-item__content">
+                        <h3 class="journey-item__role">Full Stack Developer <span class="journey-item__loc">Somnoware Healthcare Systems Pvt Ltd</span></h3>
+                        <p class="journey-item__desc">Jun 2020 – Jun 2021 · Built core product features and platform capabilities for sleep-disorder diagnosis, healthcare data compliance, and clinical testing workflows.</p>
+                    </div>
+                </li>
+                <li class="journey-item">
+                    <span class="journey-item__date">2019 – 2020</span>
+                    <div class="journey-item__content">
+                        <h3 class="journey-item__role">Software Developer <span class="journey-item__loc">CronJ IT Technologies</span></h3>
+                        <p class="journey-item__desc">Jun 2019 – Jun 2020 · Developed backend microservices and client-facing features while helping modernize monolithic codebases into scalable, service-oriented architecture.</p>
+                    </div>
+                </li>
+            </ol>
+
+            <div class="expertise">
+                <h3 class="expertise__title">Core stack</h3>
+                <ul class="expertise__tags">
+                    <li>Go</li>
+                    <li>Kafka</li>
+                    <li>Kubernetes</li>
+                    <li>Redis</li>
+                    <li>AWS / GCP</li>
+                    <li>Event-driven architecture</li>
+                    <li>Platform engineering</li>
+                    <li>CI/CD & observability</li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="showcase scroll-reveal" id="works" aria-labelledby="works-heading">
+            <header class="section-header">
+                <p class="eyebrow">Case studies</p>
+                <h2 id="works-heading" class="section-title">Work that shows <span class="text-accent">impact</span></h2>
+                <p class="section-lede">Production systems across fintech, healthcare, and platform engineering — with measurable reliability and scale outcomes.</p>
+            </header>
+
+            <div class="showcase-grid">
+                {{ range (where .Site.RegularPages "Section" "works") }}
+                <article class="proj-card">
+                    <div class="proj-card__visual">
+                        <img src="{{ .Params.image | relURL }}" alt="{{ .Title }}" class="proj-card__img" loading="lazy">
+                    </div>
+                    <div class="proj-card__copy">
+                        <div class="proj-card__meta">
+                            <span class="proj-card__tag">{{ .Params.tag }}</span>
+                            {{ if .Params.scale }}
+                            <span class="proj-card__metric">{{ .Params.scale }}</span>
+                            {{ end }}
                         </div>
-                        <div class="form-group">
-                            <label for="form-email">Email address</label>
-                            <input type="email" id="form-email" name="email" placeholder="jd@proto.com" required>
+                        <h3 class="proj-card__title">{{ .Title }}</h3>
+                        <p class="proj-card__desc">{{ .Params.description }}</p>
+                        <a href="{{ .RelPermalink }}" class="proj-card__link">Read case study <i class="fa-solid fa-arrow-right-long"></i></a>
+                    </div>
+                </article>
+                {{ end }}
+
+                <article class="proj-card">
+                    <div class="proj-card__visual">
+                        <img src="{{ "img/gokafka_toolkit.svg" | relURL }}" alt="GoKafkaToolkit" class="proj-card__img" loading="lazy">
+                    </div>
+                    <div class="proj-card__copy">
+                        <div class="proj-card__meta">
+                            <span class="proj-card__tag">Open source · Go</span>
+                            <span class="proj-card__metric">Distributed Tool</span>
                         </div>
-                        <div class="form-group">
-                            <label for="form-message">Your message</label>
-                            <textarea id="form-message" name="message" rows="4" placeholder="Describe your challenge..." required></textarea>
-                        </div>
-                        <button type="submit" class="btn-indigo">Send message</button>
-                        <p class="form-legal">{{ .Site.Params.contact.legal }}</p>
-                    </form>
+                        <h3 class="proj-card__title">GoKafkaToolkit</h3>
+                        <p class="proj-card__desc">Toolkit for Kafka producers and consumers across local, cloud, and Confluent environments.</p>
+                        <a href="https://github.com/manas2297/GoKafkaToolkit" target="_blank" rel="noopener noreferrer" class="proj-card__link">View repository <i class="fa-solid fa-arrow-right-long"></i></a>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="contact scroll-reveal" id="contact" aria-labelledby="contact-heading">
+            <div class="contact__panel">
+                <header class="contact__header">
+                    <p class="eyebrow">{{ .Site.Params.contact.eyebrow }}</p>
+                    <h2 id="contact-heading" class="section-title">{{ .Site.Params.contact.title }}</h2>
+                    <p class="contact__availability">{{ .Site.Params.contact.availabilityPrefix }} {{ .Site.Params.contact.availabilityMessage }}</p>
+                </header>
+
+                <div class="contact__actions">
+                    <a href="mailto:{{ .Site.Params.email }}" class="btn btn--primary btn--lg">
+                        <i class="fa-solid fa-envelope"></i> Email
+                    </a>
+                    <a href="https://www.linkedin.com/in/manas2297" target="_blank" rel="noopener noreferrer" class="btn btn--ghost btn--lg">
+                        <i class="fa-brands fa-linkedin-in"></i> LinkedIn
+                    </a>
+                    <a href="https://github.com/manas2297" target="_blank" rel="noopener noreferrer" class="btn btn--ghost btn--lg">
+                        <i class="fa-brands fa-github"></i> GitHub
+                    </a>
                 </div>
+                <p class="contact__note">{{ .Site.Params.contact.legal }}</p>
             </div>
         </section>
     </main>

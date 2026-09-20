@@ -11,6 +11,16 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
+    <link rel="stylesheet" href="{{ "css/variables.css" | relURL }}?v=3.0">
+    <link rel="stylesheet" href="{{ "css/layout.css" | relURL }}?v=3.0">
+    <link rel="stylesheet" href="{{ "css/hero.css" | relURL }}?v=3.0">
+    <link rel="stylesheet" href="{{ "css/works.css" | relURL }}?v=3.0">
+    <link rel="stylesheet" href="{{ "css/skills.css" | relURL }}?v=3.0">
+    <link rel="stylesheet" href="{{ "css/about.css" | relURL }}?v=3.0">
+    <link rel="stylesheet" href="{{ "css/blog.css" | relURL }}?v=3.0">
+    <link rel="stylesheet" href="{{ "css/contact.css" | relURL }}?v=3.0">
+    <link rel="stylesheet" href="{{ "css/animations.css" | relURL }}?v=3.2">
+    <link rel="stylesheet" href="{{ "css/responsive.css" | relURL }}?v=3.2">
+    {{ if .Params.extraCSS }}<link rel="stylesheet" href="{{ .Params.extraCSS | relURL }}">{{ end }}
 </head>
 <body class="page">

@@ -1,0 +1,82 @@
+/* ==========================================================================
+   CONTACT & LEGACY FORM STYLES
+   ========================================================================== */
+
+.contact {
+    padding: 3.5rem 0 1rem;
+    border-top: 1px solid var(--border);
+}
+
+.contact__panel {
+    padding: 2.5rem;
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    text-align: center;
+}
+
+.contact__header {
+    max-width: 32rem;
+    margin: 0 auto 1.75rem;
+}
+
+.contact__availability {
+    font-size: 0.9375rem;
+    color: var(--muted);
+    margin-top: 0.75rem;
+}
+
+.contact__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.contact__note {
+    font-size: 0.8125rem;
+    color: var(--subtle);
+}
+
+/* Legacy contact form (unused on home) */
+.contact-protocol {
+    padding: 3.5rem 0;
+    border-top: 1px solid var(--border);
+}
+
+.contact-form-wrap {
+    padding: 1.5rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border);
+    background: var(--surface);
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    margin-bottom: 0.35rem;
+    color: var(--text-heading);
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 0.65rem 0.85rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: 2px solid var(--accent-muted);
+    border-color: var(--accent);
+}

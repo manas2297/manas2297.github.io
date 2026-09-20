@@ -2,8 +2,11 @@
 
     <aside class="sidebar" id="sidebar" aria-label="Primary">
         <a href="{{ "/" | relURL }}" class="sidebar-brand">
-            <span class="sidebar-brand__title">{{ .Site.Params.sidebarTitle }}</span>
-            <span class="sidebar-brand__meta">{{ .Site.Params.sidebarSubtitle }}</span>
+            <span class="sidebar-brand__mark"><i class="fa-solid fa-shapes"></i></span>
+            <div class="sidebar-brand__text">
+                <span class="sidebar-brand__title">{{ .Site.Params.sidebarTitle }}</span>
+                <span class="sidebar-brand__meta">{{ .Site.Params.sidebarSubtitle }}</span>
+            </div>
         </a>
         <nav class="sidebar-nav" id="sidebar-nav">
             {{ range .Site.Menus.main }}
@@ -13,6 +16,14 @@
                 </a>
             {{ end }}
         </nav>
-        <p class="sidebar-watermark" id="brand-watermark" aria-hidden="true">{{ .Site.Params.verticalWatermark }}</p>
-        <p class="sidebar-est" id="brand-est">{{ .Site.Params.established }}</p>
+        <div class="sidebar-bottom">
+            <div class="sidebar-socials">
+                <a href="https://github.com/manas2297" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+                <a href="https://www.linkedin.com/in/manas2297" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+                <button type="button" class="theme-toggle-compact" id="theme-toggle" aria-label="Toggle theme">
+                    <i class="fa-solid fa-moon" id="theme-icon" aria-hidden="true"></i>
+                </button>
+            </div>
+            <p class="sidebar-est" id="brand-est">{{ .Site.Params.established }}</p>
+        </div>
     </aside>

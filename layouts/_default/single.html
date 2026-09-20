@@ -1,21 +1,11 @@
 {{ partial "head.html" . }}
-{{ partial "sidebar.html" . }}
+{{ partial "header.html" . }}
 
-<div class="shell">
-    <header class="top-bar">
-        <p class="top-bar__tagline">{{ .Site.Params.topBarTagline }}</p>
-        <button type="button" class="menu-btn" id="menu-btn" aria-expanded="false" aria-controls="sidebar">
-            <span class="menu-btn__label">{{ .Site.Params.menuButtonLabel }}</span>
-            <span class="menu-btn__icon" aria-hidden="true">
-                <span></span><span></span><span></span>
-            </span>
-        </button>
-    </header>
-
+<div class="page-wrap">
     <main class="main main--single">
         <article class="post-detail reveal">
             <a href="{{ "/" | relURL }}" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to home</a>
-            
+
             <header class="post-detail__header">
                 {{ if .Params.category }}
                     <span class="post-detail__cat">{{ .Params.category }}</span>
