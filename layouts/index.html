@@ -1,9 +1,9 @@
 {{ partial "head.html" . }}
 {{ partial "header.html" . }}
 
-{{ $about := hugo.Data.about | default .Site.Params.about }}
-{{ $exp := hugo.Data.experience | default .Site.Params.experience }}
-{{ $featuredProjects := hugo.Data.featured_projects | default .Site.Params.featured_projects }}
+{{ $about := site.Data.about | default .Site.Params.about }}
+{{ $exp := site.Data.experience | default .Site.Params.experience }}
+{{ $featuredProjects := site.Data.featured_projects | default .Site.Params.featured_projects }}
 {{ $githubUrl := .Site.Params.social.github | default "https://github.com/manas2297" }}
 {{ $linkedinUrl := .Site.Params.social.linkedin | default "https://www.linkedin.com/in/manas2297" }}
 
@@ -112,7 +112,7 @@
                 {{ end }}
             </ol>
 
-            {{ $skills := $exp.core_stack | default hugo.Data.skills | default .Site.Params.skills }}
+            {{ $skills := $exp.core_stack | default site.Data.skills | default .Site.Params.skills }}
             {{ with $skills }}
             <div class="expertise">
                 <h3 class="expertise__title">{{ with $exp.core_stack_title }}{{ . }}{{ else }}Core stack{{ end }}</h3>
