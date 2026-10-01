@@ -1,3 +1,11 @@
+- title: "Stitch"
+  tag: "Open source · Desktop / CLI"
+  metric: "Developer Tool"
+  description: "Energy-guided developer dashboard built with Go, Wails, and React to manage GitHub repositories, PR reviews, and build pipelines via local GitHub CLI auth."
+  image: "img/stitch_dashboard.svg"
+  link: "https://github.com/manas2297/stitch"
+  link_text: "View repository"
+
 - title: "GoKafkaToolkit"
   tag: "Open source · Go"
   metric: "Distributed Tool"
