@@ -21,6 +21,10 @@ title = 'Manas Yadav'
   menuButtonLabel = 'Menu'
   copyrightLine = '© 2026 Manas Yadav'
 
+  [params.social]
+    github = 'https://github.com/manas2297'
+    linkedin = 'https://www.linkedin.com/in/manas2297'
+
   [params.hero]
     headline = 'Lead Engineer · Distributed systems & cloud platforms'
     lede = 'I architect high-throughput distributed backends and event-driven systems that scale 10x–100x — transforming complex infrastructure into cost-efficient, high-reliability platforms that directly accelerate business growth.'

@@ -4,24 +4,162 @@
 <div class="page-wrap">
     <main class="main">
         <section class="blog-hub reveal">
-            <h1 class="blog-hub__title">Writing & <span class="text-accent">insights</span></h1>
-            <p class="blog-hub__lede">Notes on distributed backends, platform operations, and scalable developer tools.</p>
+            <!-- Hero Header with Ambient Glow & Badges -->
+            <header class="blog-hub__header">
+                <div class="blog-hub__badge">
+                    <span class="blog-hub__badge-dot" aria-hidden="true"></span>
+                    <span>Engineering Notebook & Architectural Notes</span>
+                </div>
+                <h1 class="blog-hub__title">Writing & <span class="text-accent">Systems Insights</span></h1>
+                <p class="blog-hub__lede">In-depth technical writeups on distributed backends, concurrency patterns, platform reliability, and cloud architecture at scale.</p>
+                
+                <!-- Category Filter Pills (Interactive Client-Side Filtering) -->
+                <div class="blog-hub__filters" id="blog-filters" aria-label="Filter articles by category">
+                    <button type="button" class="filter-pill is-active" data-filter="all">All Articles</button>
+                    {{ $categories := slice }}
+                    {{ range .Pages }}
+                        {{ if .Params.category }}
+                            {{ $categories = $categories | append .Params.category }}
+                        {{ end }}
+                    {{ end }}
+                    {{ range ($categories | uniq) }}
+                        <button type="button" class="filter-pill" data-filter="{{ . | urlize }}">{{ . }}</button>
+                    {{ end }}
+                </div>
+            </header>
 
-            <div class="blog-grid">
-                {{ range .Pages }}
-                    <article class="blog-card">
-                        <div class="blog-card__meta">
-                            <span class="blog-card__date">{{ .Date.Format "Jan 2, 2006" }}</span>
-                            <span class="blog-card__read">{{ .ReadingTime }} min read</span>
+            <!-- Articles Container -->
+            <div class="blog-showcase" id="blog-articles">
+                {{ $featured := where .Pages "Params.featured" true }}
+                {{ if and $featured (gt (len $featured) 0) }}
+                    {{ $leadPost := index $featured 0 }}
+                    <!-- Featured / Spotlight Story Card -->
+                    <article class="blog-featured-card" data-category="{{ if $leadPost.Params.category }}{{ $leadPost.Params.category | urlize }}{{ else }}general{{ end }}">
+                        {{ if $leadPost.Params.image }}
+                        <a href="{{ $leadPost.RelPermalink }}" class="blog-featured-card__visual" aria-label="{{ $leadPost.Title }}">
+                            <img src="{{ $leadPost.Params.image | relURL }}" alt="{{ $leadPost.Title }}" class="blog-featured-card__img" loading="eager">
+                            <span class="featured-badge"><i class="fa-solid fa-star"></i> Featured Guide</span>
+                        </a>
+                        {{ end }}
+                        <div class="blog-featured-card__body">
+                            <div class="blog-card__meta">
+                                {{ if $leadPost.Params.category }}
+                                <span class="blog-card__cat">{{ $leadPost.Params.category }}</span>
+                                <span class="blog-card__dot" aria-hidden="true">•</span>
+                                {{ end }}
+                                <span class="blog-card__date">{{ $leadPost.Date.Format "Jan 2, 2006" }}</span>
+                                <span class="blog-card__dot" aria-hidden="true">•</span>
+                                <span class="blog-card__read"><i class="fa-regular fa-clock"></i> {{ $leadPost.ReadingTime }} min read</span>
+                            </div>
+                            <h2 class="blog-featured-card__title">
+                                <a href="{{ $leadPost.RelPermalink }}">{{ $leadPost.Title }}</a>
+                            </h2>
+                            <p class="blog-featured-card__desc">
+                                {{ if $leadPost.Params.description }}{{ $leadPost.Params.description }}{{ else }}{{ $leadPost.Summary | truncate 200 }}{{ end }}
+                            </p>
+                            
+                            {{ if $leadPost.Params.tags }}
+                            <div class="blog-card__tags">
+                                {{ range $leadPost.Params.tags }}
+                                <span class="tag-pill">#{{ . }}</span>
+                                {{ end }}
+                            </div>
+                            {{ end }}
+
+                            <a href="{{ $leadPost.RelPermalink }}" class="blog-featured-card__btn">
+                                <span>Read in-depth article</span>
+                                <i class="fa-solid fa-arrow-right-long" aria-hidden="true"></i>
+                            </a>
                         </div>
-                        <h2 class="blog-card__title">
-                            <a href="{{ .RelPermalink }}">{{ .Title }}</a>
-                        </h2>
-                        <p class="blog-card__desc">{{ .Summary | truncate 160 }}</p>
-                        <a href="{{ .RelPermalink }}" class="blog-card__link">Read article <i class="fa-solid fa-arrow-right-long"></i></a>
                     </article>
                 {{ end }}
+
+                <!-- Regular Grid of Articles -->
+                <div class="blog-grid">
+                    {{ range .Pages }}
+                        <article class="blog-card" data-category="{{ if .Params.category }}{{ .Params.category | urlize }}{{ else }}general{{ end }}">
+                            {{ if .Params.image }}
+                            <a href="{{ .RelPermalink }}" class="blog-card__visual" aria-label="{{ .Title }}">
+                                <img src="{{ .Params.image | relURL }}" alt="{{ .Title }}" class="blog-card__img" loading="lazy">
+                                {{ if .Params.tag }}
+                                <span class="blog-card__topic-tag">{{ .Params.tag }}</span>
+                                {{ end }}
+                            </a>
+                            {{ end }}
+                            <div class="blog-card__body">
+                                <div class="blog-card__meta">
+                                    {{ if .Params.category }}
+                                    <span class="blog-card__cat">{{ .Params.category }}</span>
+                                    <span class="blog-card__dot" aria-hidden="true">•</span>
+                                    {{ end }}
+                                    <span class="blog-card__date">{{ .Date.Format "Jan 2, 2006" }}</span>
+                                    <span class="blog-card__dot" aria-hidden="true">•</span>
+                                    <span class="blog-card__read"><i class="fa-regular fa-clock"></i> {{ .ReadingTime }} min</span>
+                                </div>
+                                <h3 class="blog-card__title">
+                                    <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+                                </h3>
+                                <p class="blog-card__desc">
+                                    {{ if .Params.description }}{{ .Params.description }}{{ else }}{{ .Summary | truncate 150 }}{{ end }}
+                                </p>
+                                
+                                {{ if .Params.tags }}
+                                <div class="blog-card__tags">
+                                    {{ range .Params.tags }}
+                                    <span class="tag-pill">{{ . }}</span>
+                                    {{ end }}
+                                </div>
+                                {{ end }}
+
+                                <div class="blog-card__footer">
+                                    <a href="{{ .RelPermalink }}" class="blog-card__link">
+                                        <span>Read article</span>
+                                        <i class="fa-solid fa-arrow-right-long"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+                    {{ end }}
+                </div>
+            </div>
+
+            <!-- Empty State (if filtered to nothing) -->
+            <div class="blog-empty" id="blog-empty" style="display: none;">
+                <i class="fa-solid fa-filter-circle-xmark"></i>
+                <p>No articles found under this category.</p>
             </div>
         </section>
     </main>
 {{ partial "footer.html" . }}
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const filterButtons = document.querySelectorAll('#blog-filters .filter-pill');
+    const articles = document.querySelectorAll('#blog-articles [data-category]');
+    const emptyState = document.getElementById('blog-empty');
+
+    filterButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            filterButtons.forEach(btn => btn.classList.remove('is-active'));
+            button.classList.add('is-active');
+
+            const filterValue = button.getAttribute('data-filter');
+            let visibleCount = 0;
+
+            articles.forEach(article => {
+                const category = article.getAttribute('data-category');
+                if (filterValue === 'all' || category === filterValue) {
+                    article.style.display = '';
+                    visibleCount++;
+                } else {
+                    article.style.display = 'none';
+                }
+            });
+
+            if (emptyState) {
+                emptyState.style.display = visibleCount === 0 ? 'flex' : 'none';
+            }
+        });
+    });
+});
+</script>

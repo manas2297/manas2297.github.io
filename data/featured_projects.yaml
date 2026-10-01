@@ -1,0 +1,7 @@
+- title: "GoKafkaToolkit"
+  tag: "Open source · Go"
+  metric: "Distributed Tool"
+  description: "Toolkit for Kafka producers and consumers across local, cloud, and Confluent environments."
+  image: "img/gokafka_toolkit.svg"
+  link: "https://github.com/manas2297/GoKafkaToolkit"
+  link_text: "View repository"

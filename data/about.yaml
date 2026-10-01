@@ -1,0 +1,13 @@
+eyebrow: "About"
+title: "Engineering scale with <span class=\"text-accent\">business impact</span>"
+
+paragraphs:
+  - "Over my years in backend and platform engineering across **HealthTech, FinTech, and SaaS**, I’ve contributed in diverse domains and built systems both from scratch and at massive throughput. My focus has beed deep technical execution with clear business outcomes — scaling backend architectures from **10x to 100x**, optimizing cloud spend to bring down system costs, and turning fragile services into bulletproof operations."
+  - "As a senior developer and technical lead, I look at systems proactively with a keen eye for architectural bottlenecks before they turn into outages. I’ve guided engineering teams through the intense challenges of high-growth startups, placing high value on mentoring developers, elevating engineering standards, and building resilient platforms that drive long-term business value."
+
+aside_title: "Where I add value"
+aside_points:
+  - "10x–100x system scaling & performance optimization"
+  - "Infrastructure cost reduction & cloud efficiency"
+  - "Engineering leadership, mentoring & team growth"
+  - "Fault-tolerant distributed & event-driven systems"

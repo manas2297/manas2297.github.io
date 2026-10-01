@@ -1,6 +1,12 @@
 {{ partial "head.html" . }}
 {{ partial "header.html" . }}
 
+{{ $about := hugo.Data.about | default .Site.Params.about }}
+{{ $exp := hugo.Data.experience | default .Site.Params.experience }}
+{{ $featuredProjects := hugo.Data.featured_projects | default .Site.Params.featured_projects }}
+{{ $githubUrl := .Site.Params.social.github | default "https://github.com/manas2297" }}
+{{ $linkedinUrl := .Site.Params.social.linkedin | default "https://www.linkedin.com/in/manas2297" }}
+
 <div class="page-wrap">
     <main class="main">
         <section class="hero" id="welcome" aria-label="Introduction">
@@ -14,7 +20,7 @@
                         <span class="hero__availability-dot" aria-hidden="true"></span>
                         {{ .Site.Params.availabilityBadge }}
                     </p>
-                    <h1 class="hero__title">Manas Yadav</h1>
+                    <h1 class="hero__title">{{ .Site.Params.hero.name | default .Site.Title }}</h1>
                     <p class="hero__headline">{{ .Site.Params.hero.headline }}</p>
                     <p class="hero__lede">{{ .Site.Params.hero.lede }}</p>
 
@@ -30,8 +36,8 @@
                     </div>
 
                     <div class="hero__social">
-                        <a href="https://github.com/manas2297" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
-                        <a href="https://www.linkedin.com/in/manas2297" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+                        <a href="{{ $githubUrl }}" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fa-brands fa-github"></i></a>
+                        <a href="{{ $linkedinUrl }}" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
                         <a href="mailto:{{ .Site.Params.email }}" aria-label="Email"><i class="fa-solid fa-envelope"></i></a>
                     </div>
                 </div>
@@ -46,23 +52,30 @@
 
         <section class="about scroll-reveal" id="about" aria-labelledby="about-heading">
             <header class="section-header section-header--compact">
-                <p class="eyebrow">About</p>
-                <h2 id="about-heading" class="section-title">Engineering scale with <span class="text-accent">business impact</span></h2>
+                <p class="eyebrow">{{ with $about.eyebrow }}{{ . }}{{ else }}About{{ end }}</p>
+                <h2 id="about-heading" class="section-title">{{ with $about.title }}{{ . | safeHTML }}{{ else }}Engineering scale with <span class="text-accent">business impact</span>{{ end }}</h2>
             </header>
 
             <div class="about__grid">
                 <div class="about__copy">
-                    <p>Over my years in backend and platform engineering across <strong>HealthTech, FinTech, and SaaS</strong>, I’ve navigated diverse domains and built systems both from scratch and at massive throughput. My focus bridges deep technical execution with clear business outcomes — scaling backend architectures from <strong>10x to 100x</strong>, optimizing cloud spend to bring down system costs, and turning fragile services into bulletproof operations.</p>
-                    <p>As a senior developer and technical lead, I look at systems proactively with a keen eye for architectural bottlenecks before they turn into outages. I’ve guided engineering teams through the intense challenges of high-growth startups, placing high value on mentoring developers, elevating engineering standards, and building resilient platforms that drive long-term business value.</p>
-                    <blockquote class="pullquote">{{ .Site.Params.philosophy.pullquote }}</blockquote>
+                    {{ with $about.paragraphs }}
+                        {{ range . }}
+                        <p>{{ . | markdownify }}</p>
+                        {{ end }}
+                    {{ else }}
+                        <p>Over my years in backend and platform engineering across <strong>HealthTech, FinTech, and SaaS</strong>, I’ve navigated diverse domains and built systems both from scratch and at massive throughput. My focus bridges deep technical execution with clear business outcomes — scaling backend architectures from <strong>10x to 100x</strong>, optimizing cloud spend to bring down system costs, and turning fragile services into bulletproof operations.</p>
+                        <p>As a senior developer and technical lead, I look at systems proactively with a keen eye for architectural bottlenecks before they turn into outages. I’ve guided engineering teams through the intense challenges of high-growth startups, placing high value on mentoring developers, elevating engineering standards, and building resilient platforms that drive long-term business value.</p>
+                    {{ end }}
+                    {{ with .Site.Params.philosophy.pullquote }}
+                    <blockquote class="pullquote">{{ . }}</blockquote>
+                    {{ end }}
                 </div>
                 <aside class="about__aside" aria-label="What I help teams with">
-                    <h3 class="about__aside-title">Where I add value</h3>
+                    <h3 class="about__aside-title">{{ with $about.aside_title }}{{ . }}{{ else }}Where I add value{{ end }}</h3>
                     <ul class="about__list">
-                        <li>10x–100x system scaling & performance optimization</li>
-                        <li>Infrastructure cost reduction & cloud efficiency</li>
-                        <li>Engineering leadership, mentoring & team growth</li>
-                        <li>Fault-tolerant distributed & event-driven systems</li>
+                        {{ range ($about.aside_points | default $about.highlights) }}
+                        <li>{{ . | markdownify }}</li>
+                        {{ end }}
                     </ul>
                 </aside>
             </div>
@@ -70,54 +83,46 @@
 
         <section class="experience scroll-reveal" id="experience" aria-labelledby="experience-heading">
             <header class="section-header">
-                <p class="eyebrow">Background</p>
-                <h2 id="experience-heading" class="section-title">Experience & <span class="text-accent">expertise</span></h2>
+                <p class="eyebrow">{{ with $exp.eyebrow }}{{ . }}{{ else }}Background{{ end }}</p>
+                <h2 id="experience-heading" class="section-title">{{ with $exp.title }}{{ . | safeHTML }}{{ else }}Experience & <span class="text-accent">expertise</span>{{ end }}</h2>
             </header>
 
             <ol class="journey__list">
+                {{ $jobs := slice }}
+                {{ if reflect.IsSlice $exp }}
+                    {{ $jobs = $exp }}
+                {{ else if reflect.IsMap $exp }}
+                    {{ $jobs = $exp.jobs }}
+                {{ end }}
+                {{ range $jobs }}
                 <li class="journey-item">
-                    <span class="journey-item__date">2024 – Present</span>
+                    <span class="journey-item__date">{{ .period }}</span>
                     <div class="journey-item__content">
-                        <h3 class="journey-item__role">Lead Engineer <span class="journey-item__loc">HighLevel India Pvt Ltd</span></h3>
-                        <p class="journey-item__desc">Feb 2024 – Present · Leading distributed backend systems architecture, platform reliability, and high-throughput infrastructure scaling. Mentoring engineering teams and driving technical strategy through high-growth scale.</p>
+                        <h3 class="journey-item__role">{{ .role }} {{ with .company }}<span class="journey-item__loc">{{ . }}</span>{{ end }}</h3>
+                        <p class="journey-item__desc">{{ .description | markdownify }}</p>
+                        {{ with .tech }}
+                        <ul class="journey-item__tech">
+                            {{ range . }}
+                            <li>{{ . }}</li>
+                            {{ end }}
+                        </ul>
+                        {{ end }}
                     </div>
                 </li>
-                <li class="journey-item">
-                    <span class="journey-item__date">2021 – 2024</span>
-                    <div class="journey-item__content">
-                        <h3 class="journey-item__role">Software Development Engineer III <span class="journey-item__loc">CoinDCX</span></h3>
-                        <p class="journey-item__desc">Apr 2021 – Feb 2024 · Rapid progression from SDE 1 (Apr 2021 – Apr 2022) → SDE 2 (Apr 2022 – Apr 2023) → SDE 3 (Apr 2023 – Feb 2024). Spearheaded core trading backbone systems, led cross-region zero-downtime Kafka migration (cutting latency from 250ms to &lt;10ms), and scaled infrastructure for 15M+ users.</p>
-                    </div>
-                </li>
-                <li class="journey-item">
-                    <span class="journey-item__date">2020 – 2021</span>
-                    <div class="journey-item__content">
-                        <h3 class="journey-item__role">Full Stack Developer <span class="journey-item__loc">Somnoware Healthcare Systems Pvt Ltd</span></h3>
-                        <p class="journey-item__desc">Jun 2020 – Jun 2021 · Built core product features and platform capabilities for sleep-disorder diagnosis, healthcare data compliance, and clinical testing workflows.</p>
-                    </div>
-                </li>
-                <li class="journey-item">
-                    <span class="journey-item__date">2019 – 2020</span>
-                    <div class="journey-item__content">
-                        <h3 class="journey-item__role">Software Developer <span class="journey-item__loc">CronJ IT Technologies</span></h3>
-                        <p class="journey-item__desc">Jun 2019 – Jun 2020 · Developed backend microservices and client-facing features while helping modernize monolithic codebases into scalable, service-oriented architecture.</p>
-                    </div>
-                </li>
+                {{ end }}
             </ol>
 
+            {{ $skills := $exp.core_stack | default hugo.Data.skills | default .Site.Params.skills }}
+            {{ with $skills }}
             <div class="expertise">
-                <h3 class="expertise__title">Core stack</h3>
+                <h3 class="expertise__title">{{ with $exp.core_stack_title }}{{ . }}{{ else }}Core stack{{ end }}</h3>
                 <ul class="expertise__tags">
-                    <li>Go</li>
-                    <li>Kafka</li>
-                    <li>Kubernetes</li>
-                    <li>Redis</li>
-                    <li>AWS / GCP</li>
-                    <li>Event-driven architecture</li>
-                    <li>Platform engineering</li>
-                    <li>CI/CD & observability</li>
+                    {{ range . }}
+                    <li>{{ . }}</li>
+                    {{ end }}
                 </ul>
             </div>
+            {{ end }}
         </section>
 
         <section class="showcase scroll-reveal" id="works" aria-labelledby="works-heading">
@@ -147,20 +152,24 @@
                 </article>
                 {{ end }}
 
+                {{ range $featuredProjects }}
                 <article class="proj-card">
                     <div class="proj-card__visual">
-                        <img src="{{ "img/gokafka_toolkit.svg" | relURL }}" alt="GoKafkaToolkit" class="proj-card__img" loading="lazy">
+                        <img src="{{ .image | relURL }}" alt="{{ .title }}" class="proj-card__img" loading="lazy">
                     </div>
                     <div class="proj-card__copy">
                         <div class="proj-card__meta">
-                            <span class="proj-card__tag">Open source · Go</span>
-                            <span class="proj-card__metric">Distributed Tool</span>
+                            <span class="proj-card__tag">{{ .tag }}</span>
+                            {{ if .metric }}
+                            <span class="proj-card__metric">{{ .metric }}</span>
+                            {{ end }}
                         </div>
-                        <h3 class="proj-card__title">GoKafkaToolkit</h3>
-                        <p class="proj-card__desc">Toolkit for Kafka producers and consumers across local, cloud, and Confluent environments.</p>
-                        <a href="https://github.com/manas2297/GoKafkaToolkit" target="_blank" rel="noopener noreferrer" class="proj-card__link">View repository <i class="fa-solid fa-arrow-right-long"></i></a>
+                        <h3 class="proj-card__title">{{ .title }}</h3>
+                        <p class="proj-card__desc">{{ .description }}</p>
+                        <a href="{{ .link }}" {{ if hasPrefix .link "http" }}target="_blank" rel="noopener noreferrer"{{ end }} class="proj-card__link">{{ .link_text | default "View repository" }} <i class="fa-solid fa-arrow-right-long"></i></a>
                     </div>
                 </article>
+                {{ end }}
             </div>
         </section>
 
@@ -176,10 +185,10 @@
                     <a href="mailto:{{ .Site.Params.email }}" class="btn btn--primary btn--lg">
                         <i class="fa-solid fa-envelope"></i> Email
                     </a>
-                    <a href="https://www.linkedin.com/in/manas2297" target="_blank" rel="noopener noreferrer" class="btn btn--ghost btn--lg">
+                    <a href="{{ $linkedinUrl }}" target="_blank" rel="noopener noreferrer" class="btn btn--ghost btn--lg">
                         <i class="fa-brands fa-linkedin-in"></i> LinkedIn
                     </a>
-                    <a href="https://github.com/manas2297" target="_blank" rel="noopener noreferrer" class="btn btn--ghost btn--lg">
+                    <a href="{{ $githubUrl }}" target="_blank" rel="noopener noreferrer" class="btn btn--ghost btn--lg">
                         <i class="fa-brands fa-github"></i> GitHub
                     </a>
                 </div>
