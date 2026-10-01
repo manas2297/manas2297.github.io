@@ -157,6 +157,58 @@
     line-height: 1.6;
 }
 
+.journey-item__desc strong {
+    color: var(--text-heading);
+    font-weight: 600;
+}
+
+.journey-item__desc .metric {
+    display: inline-block;
+    color: var(--accent);
+    background: var(--accent-light, rgba(99, 102, 241, 0.12));
+    border: 1px solid var(--accent-muted, rgba(99, 102, 241, 0.3));
+    padding: 0.05rem 0.4rem;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.84rem;
+    letter-spacing: -0.01em;
+}
+
+.journey-item__desc .metric--success {
+    color: #34d399;
+    background: rgba(52, 211, 153, 0.12);
+    border-color: rgba(52, 211, 153, 0.3);
+}
+
+.journey-item__tech {
+    list-style: none;
+    margin: 0.85rem 0 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem 0.5rem;
+    align-items: center;
+}
+
+.journey-item__tech li {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.2;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    transition: var(--transition, 0.2s ease);
+}
+
+.journey-item__tech li:hover {
+    border-color: var(--border-hover);
+    color: var(--text-heading);
+}
+
 /* ── CAPABILITY RINGS ── */
 .skill-rings {
     display: grid;

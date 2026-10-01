@@ -40,6 +40,19 @@ python3 -m http.server 8000
 
 Then open: `http://localhost:8000`
 
+## Editing Site Content
+
+All homepage content is templated out into YAML data files in `data/` and `hugo.toml`:
+
+- **Work Experience & Companies:** [`data/experience.yaml`](file:///Users/manas/Documents/portfolio/data/experience.yaml)
+  - Add or update roles, company names, dates, descriptions, and the core stack list.
+- **About Section & Highlights:** [`data/about.yaml`](file:///Users/manas/Documents/portfolio/data/about.yaml)
+  - Edit the summary paragraphs (markdown-supported) and "Where I add value" points.
+- **Featured / Open-Source Projects:** [`data/featured_projects.yaml`](file:///Users/manas/Documents/portfolio/data/featured_projects.yaml)
+  - Add repository cards (like GoKafkaToolkit) with title, tags, description, and link.
+- **Hero & General Site Configuration:** [`hugo.toml`](file:///Users/manas/Documents/portfolio/hugo.toml)
+  - Update email, social links (`[params.social]`), headline, availability badge, and navigation.
+
 ## Deploy on GitHub Pages
 
 Because this site uses Hugo templates, GitHub Pages needs to build the site using GitHub Actions:

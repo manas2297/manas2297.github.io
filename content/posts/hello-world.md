@@ -2,7 +2,11 @@
 title: "Building High-Performance Event Streams in Go"
 date: 2026-08-02
 category: "Distributed Systems"
-description: "A look at optimizing concurrency, batching mechanisms, and channel strategies inside Go Kafka producers."
+tag: "Golang & Concurrency"
+tags: ["Go", "Kafka", "Concurrency", "Performance"]
+image: "img/go_event_streams.png"
+featured: true
+description: "A deep dive into optimizing concurrency primitives, batching mechanisms, and channel strategies inside Go Kafka producers."
 ---
 
 When building high-throughput services in Go, standard channel architectures can become bottlenecks under high load. This article details optimization strategies for event pipelines.
