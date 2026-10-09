@@ -60,8 +60,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!depthManaged) {
             document.querySelectorAll('.about__grid > *').forEach((el) => el.classList.add('scroll-hidden'));
             document.querySelectorAll('.contact__panel').forEach((el) => el.classList.add('scroll-hidden', 'scroll-scale'));
+            document.querySelectorAll('.contact__header > *, .contact__actions .btn, .contact__note').forEach((el) => el.classList.add('scroll-hidden'));
         }
-        document.querySelectorAll('.contact__header > *, .contact__actions .btn, .contact__note').forEach((el) => el.classList.add('scroll-hidden'));
         document.querySelectorAll('.blog-card').forEach((el) => el.classList.add('scroll-hidden'));
         document.querySelectorAll('.site-footer').forEach((el) => el.classList.add('scroll-hidden'));
         document.querySelectorAll('.scroll-reveal').forEach((el) => el.classList.add('scroll-hidden'));
