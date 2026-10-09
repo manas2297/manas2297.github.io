@@ -133,6 +133,75 @@
     100% { top: 100%; opacity: 0; }
 }
 
+/* ── Three.js version of the stack (js/stack3d.js) ── */
+.stack__canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+}
+
+.stack.is-3d .stack__canvas {
+    display: block;
+}
+
+.stack.is-3d .stack__scene {
+    display: none;
+}
+
+.stack__tags {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.stack__tag {
+    position: absolute;
+    top: 0.5rem;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding-left: 14px;
+    width: 220px;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.stack__tag::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.45rem;
+    width: 8px;
+    height: 1px;
+    background: var(--accent);
+}
+
+.stack__tag.is-active {
+    opacity: 1;
+    transform: none;
+}
+
+.stack__tag-name {
+    font: 500 11px/1.2 var(--font-mono);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+    transition: color 0.3s ease;
+}
+
+.stack__tag-metric {
+    font: 500 13px/1.3 var(--font-sans);
+    color: var(--accent);
+}
+
+.stack__tag.is-active .stack__tag-name {
+    color: var(--text-heading);
+}
+
 /* ── Request-path spine drawn as you scroll ── */
 .has-depth .main {
     position: relative;
@@ -277,7 +346,12 @@
     }
 
     .stack {
-        height: 330px;
+        height: 400px;
+    }
+
+    .stack__tag {
+        top: auto;
+        bottom: 0;
     }
 
     .stack__scene {

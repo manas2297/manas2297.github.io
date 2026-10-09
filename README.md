@@ -36,9 +36,9 @@ Then open: `http://localhost:8000`
 
 ## Depth & scroll effects
 
-The home page has no WebGL. `static/js/depth.js` (styles in `static/css/depth.css`) drives four effects:
+On the home page, `static/js/depth.js` (styles in `static/css/depth.css`) drives four effects:
 
-- **Hero stack:** a CSS-3D isometric architecture stack (edge, services, Kafka, storage) that separates as you scroll and tilts with the pointer. Its markup is in `layouts/index.html`.
+- **Hero model:** `static/js/stack3d.js` renders a lit Three.js model of the architecture: edge, Go services, Kafka partitions with live messages, and storage. The layers separate as you scroll, hovering a layer shows a real metric, and an idle cycle walks through the layers. Three.js r169 is vendored under `static/vendor/three/` and loaded through an import map, so there's no npm step. Without WebGL, the CSS-3D stack in `layouts/index.html` is shown instead.
 - **Request path:** a curve in the left gutter that draws from `GET /` to `200 OK` as you scroll. Each section's label comes from its `data-route` attribute.
 - **Experience rail:** the timeline fills role by role.
 - **Perspective:** cards and panels lean back until they are inside the viewport, and project cards tilt toward the pointer.
