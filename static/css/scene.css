@@ -1,0 +1,194 @@
+/* ==========================================================================
+   3D SCENE BACKDROP (home page)
+   The canvas sits fixed behind the page; content floats over it on glass.
+   ========================================================================== */
+
+.scene-canvas {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1.4s ease;
+}
+
+.scene-canvas.is-ready {
+    opacity: 1;
+}
+
+.scene-vignette {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(ellipse 120% 90% at 50% 45%, transparent 55%, rgba(3, 4, 8, 0.75) 100%),
+        linear-gradient(90deg, rgba(5, 7, 12, 0.55) 0%, transparent 55%);
+}
+
+.scene-hud {
+    position: fixed;
+    left: 1.25rem;
+    bottom: 1.1rem;
+    z-index: 2;
+    display: none;
+    align-items: center;
+    gap: 0.75rem;
+    font: 500 0.7rem/1 ui-monospace, 'SFMono-Regular', Menlo, monospace;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    pointer-events: none;
+}
+
+.scene-hud__track {
+    width: 120px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+}
+
+.scene-hud__bar {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #6366f1, #22d3ee);
+    transform-origin: left;
+    transform: scaleX(0);
+}
+
+.scene-hud__depth {
+    color: var(--subtle);
+    min-width: 6ch;
+}
+
+/* ── With the scene running ── */
+.has-scene,
+.has-scene body {
+    background-color: #05070c;
+}
+
+.has-scene .page-wrap {
+    position: relative;
+    z-index: 1;
+}
+
+.has-scene .scene-hud {
+    display: inline-flex;
+}
+
+.has-scene .hero {
+    min-height: calc(100vh - var(--header-total-height) - 2.5rem);
+    display: flex;
+    align-items: center;
+}
+
+.has-scene .hero__grid {
+    width: 100%;
+}
+
+.has-scene .hero__title {
+    text-shadow: 0 0 40px rgba(99, 102, 241, 0.35);
+}
+
+.has-scene .main > section + section {
+    margin-top: 18vh;
+}
+
+/* Glass panels so copy stays readable over moving geometry. */
+.has-scene .hero__availability,
+.has-scene .hero__social a,
+.has-scene .about__copy,
+.has-scene .about__aside,
+.has-scene .journey-item,
+.has-scene .expertise,
+.has-scene .proj-card,
+.has-scene .contact__panel,
+.has-scene .site-footer {
+    background: rgba(12, 15, 24, 0.58);
+    border: 1px solid rgba(148, 163, 255, 0.12);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    backdrop-filter: blur(14px) saturate(140%);
+}
+
+.has-scene .about__copy {
+    padding: 1.75rem;
+    border-radius: var(--radius-lg);
+}
+
+.has-scene .journey-item {
+    padding: 1.25rem 1.4rem;
+    border-radius: var(--radius-md);
+    margin-bottom: 0.9rem;
+}
+
+.has-scene .expertise {
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+}
+
+.has-scene .site-footer {
+    border-width: 1px 0 0;
+}
+
+.has-scene .proj-card:hover,
+.has-scene .journey-item:hover {
+    border-color: rgba(34, 211, 238, 0.35);
+    box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.12), 0 18px 50px rgba(34, 211, 238, 0.08);
+}
+
+.about__portrait {
+    margin: 0 0 1.25rem;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    aspect-ratio: 4 / 5;
+    max-height: 340px;
+}
+
+.about__portrait img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 30%;
+}
+
+/* ── Fallback: no WebGL ── */
+.scene-fallback .scene-canvas,
+.scene-fallback .scene-vignette {
+    display: none;
+}
+
+.scene-fallback body {
+    background:
+        radial-gradient(circle at 80% 10%, rgba(99, 102, 241, 0.18), transparent 45%),
+        radial-gradient(circle at 10% 70%, rgba(34, 211, 238, 0.1), transparent 40%),
+        var(--bg);
+    background-attachment: fixed;
+}
+
+@media (max-width: 820px) {
+    .hero__visual {
+        display: none;
+    }
+
+    .scene-vignette {
+        background:
+            linear-gradient(rgba(5, 7, 12, 0.45), rgba(5, 7, 12, 0.45)),
+            radial-gradient(ellipse 140% 90% at 50% 40%, transparent 30%, rgba(3, 4, 8, 0.8) 100%);
+    }
+
+    .has-scene .scene-hud {
+        display: none;
+    }
+
+    .has-scene .main > section + section {
+        margin-top: 10vh;
+    }
+
+    .has-scene .about__copy {
+        padding: 1.25rem;
+    }
+}

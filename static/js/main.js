@@ -86,12 +86,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 { opacity: [0, 1], y: [22, 0] },
                 { duration: 0.65, delay: stagger(0.07, { start: 0.12 }), easing: easeOut }
             );
-
-            animate(
-                '.hero__portrait',
-                { opacity: [0, 1], scale: [0.94, 1], x: [28, 0] },
-                { duration: 0.85, delay: 0.18, easing: easeOut }
-            );
         }
 
         const revealOnScroll = (selector, keyframes, options = {}) => {

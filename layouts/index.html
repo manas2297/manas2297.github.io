@@ -7,13 +7,17 @@
 {{ $githubUrl := .Site.Params.social.github | default "https://github.com/manas2297" }}
 {{ $linkedinUrl := .Site.Params.social.linkedin | default "https://www.linkedin.com/in/manas2297" }}
 
+<canvas class="scene-canvas" id="scene" aria-hidden="true"></canvas>
+<div class="scene-vignette" aria-hidden="true"></div>
+<div class="scene-hud" aria-hidden="true">
+    <span class="scene-hud__label" id="scene-hud-label">01 / welcome</span>
+    <span class="scene-hud__track"><span class="scene-hud__bar" id="scene-hud-bar"></span></span>
+    <span class="scene-hud__depth" id="scene-hud-depth">z 14.0</span>
+</div>
+
 <div class="page-wrap">
     <main class="main">
-        <section class="hero" id="welcome" aria-label="Introduction">
-            <div class="hero__ambient" aria-hidden="true">
-                <span class="hero__orb hero__orb--1"></span>
-                <span class="hero__orb hero__orb--2"></span>
-            </div>
+        <section class="hero" id="welcome" data-scene-label="welcome" aria-label="Introduction">
             <div class="hero__grid">
                 <div class="hero__content">
                     <p class="hero__availability">
@@ -42,15 +46,11 @@
                     </div>
                 </div>
 
-                <div class="hero__visual">
-                    <div class="hero__portrait">
-                        <img src="{{ .Site.Params.hero.portraitSrc | relURL }}" alt="{{ .Site.Params.hero.portraitAlt }}" width="420" height="520" loading="eager">
-                    </div>
-                </div>
+                <div class="hero__visual" aria-hidden="true"></div>
             </div>
         </section>
 
-        <section class="about scroll-reveal" id="about" aria-labelledby="about-heading">
+        <section class="about scroll-reveal" id="about" data-scene-label="about" aria-labelledby="about-heading">
             <header class="section-header section-header--compact">
                 <p class="eyebrow">{{ with $about.eyebrow }}{{ . }}{{ else }}About{{ end }}</p>
                 <h2 id="about-heading" class="section-title">{{ with $about.title }}{{ . | safeHTML }}{{ else }}Engineering scale with <span class="text-accent">business impact</span>{{ end }}</h2>
@@ -71,6 +71,9 @@
                     {{ end }}
                 </div>
                 <aside class="about__aside" aria-label="What I help teams with">
+                    <figure class="about__portrait">
+                        <img src="{{ .Site.Params.hero.portraitSrc | relURL }}" alt="{{ .Site.Params.hero.portraitAlt }}" width="720" height="960" loading="lazy">
+                    </figure>
                     <h3 class="about__aside-title">{{ with $about.aside_title }}{{ . }}{{ else }}Where I add value{{ end }}</h3>
                     <ul class="about__list">
                         {{ range ($about.aside_points | default $about.highlights) }}
@@ -81,7 +84,7 @@
             </div>
         </section>
 
-        <section class="experience scroll-reveal" id="experience" aria-labelledby="experience-heading">
+        <section class="experience scroll-reveal" id="experience" data-scene-label="experience" aria-labelledby="experience-heading">
             <header class="section-header">
                 <p class="eyebrow">{{ with $exp.eyebrow }}{{ . }}{{ else }}Background{{ end }}</p>
                 <h2 id="experience-heading" class="section-title">{{ with $exp.title }}{{ . | safeHTML }}{{ else }}Experience & <span class="text-accent">expertise</span>{{ end }}</h2>
@@ -125,7 +128,7 @@
             {{ end }}
         </section>
 
-        <section class="showcase scroll-reveal" id="works" aria-labelledby="works-heading">
+        <section class="showcase scroll-reveal" id="works" data-scene-label="works" aria-labelledby="works-heading">
             <header class="section-header">
                 <p class="eyebrow">Case studies</p>
                 <h2 id="works-heading" class="section-title">Work that shows <span class="text-accent">impact</span></h2>
@@ -173,7 +176,7 @@
             </div>
         </section>
 
-        <section class="contact scroll-reveal" id="contact" aria-labelledby="contact-heading">
+        <section class="contact scroll-reveal" id="contact" data-scene-label="contact" aria-labelledby="contact-heading">
             <div class="contact__panel">
                 <header class="contact__header">
                     <p class="eyebrow">{{ .Site.Params.contact.eyebrow }}</p>
@@ -196,4 +199,13 @@
             </div>
         </section>
     </main>
+<script type="importmap">
+    {
+        "imports": {
+            "three": "{{ "vendor/three/build/three.module.min.js" | relURL }}",
+            "three/addons/": "{{ "vendor/three/addons/" | relURL }}"
+        }
+    }
+</script>
+<script type="module" src="{{ "js/scene.js" | relURL }}?v=1.0"></script>
 {{ partial "footer.html" . }}

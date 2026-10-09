@@ -30,7 +30,7 @@ title = 'Manas Yadav'
     lede = 'I architect high-throughput distributed backends and event-driven systems that scale 10x–100x — transforming complex infrastructure into cost-efficient, high-reliability platforms that directly accelerate business growth.'
     ctaPrimary = 'Get in touch'
     ctaSecondary = 'View case studies'
-    portraitSrc = 'img/hero.png'
+    portraitSrc = 'img/portrait.jpg'
     portraitAlt = 'Manas Yadav — Lead Engineer'
     proofPoints = [
       '7+ years building scalable backends',

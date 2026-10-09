@@ -20,13 +20,7 @@ hugo server -D
 
 Then open your browser at:
 
-- `http://localhost:1313/portfolio/`
-
-> **Note:** If you want to preview without the `/portfolio/` subpath locally, run:
-> ```bash
-> hugo server --baseURL http://localhost:1313/
-> ```
-> then open `http://localhost:1313/`.
+- `http://localhost:1313/`
 
 ### Alternative: Static HTML preview with Python
 
@@ -39,6 +33,14 @@ python3 -m http.server 8000
 ```
 
 Then open: `http://localhost:8000`
+
+## 3D scene
+
+The home page renders a scroll-driven Three.js scene behind the content (`static/js/scene.js`, styles in `static/css/scene.css`). Three.js r169 and its bloom post-processing addons are vendored under `static/vendor/three/` and loaded through an import map in `layouts/index.html`, so there is still no npm or bundler step.
+
+- Each homepage section (`#welcome`, `#about`, `#experience`, `#works`, `#contact`) has a camera keyframe in `scene.js`; reorder or add sections there.
+- The experience ring count and the works card count follow the number of roles and project cards on the page.
+- Visitors without WebGL get a static gradient; visitors with reduced motion get a still frame that only moves when they scroll.
 
 ## Editing Site Content
 
@@ -65,7 +67,7 @@ Because this site uses Hugo templates, GitHub Pages needs to build the site usin
 
 Your site will automatically build and deploy to:
 
-- `https://manas2297.github.io/portfolio/`
+- `https://manas2297.github.io/`
 
 ## Optional: GitHub Profile README
 
