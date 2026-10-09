@@ -34,13 +34,16 @@ python3 -m http.server 8000
 
 Then open: `http://localhost:8000`
 
-## 3D scene
+## Depth & scroll effects
 
-The home page renders a scroll-driven Three.js scene behind the content (`static/js/scene.js`, styles in `static/css/scene.css`). Three.js r169 and its bloom post-processing addons are vendored under `static/vendor/three/` and loaded through an import map in `layouts/index.html`, so there is still no npm or bundler step.
+The home page has no WebGL. `static/js/depth.js` (styles in `static/css/depth.css`) drives four effects:
 
-- Each homepage section (`#welcome`, `#about`, `#experience`, `#works`, `#contact`) has a camera keyframe in `scene.js`; reorder or add sections there.
-- The experience ring count and the works card count follow the number of roles and project cards on the page.
-- Visitors without WebGL get a static gradient; visitors with reduced motion get a still frame that only moves when they scroll.
+- **Hero stack:** a CSS-3D isometric architecture stack (edge, services, Kafka, storage) that separates as you scroll and tilts with the pointer. Its markup is in `layouts/index.html`.
+- **Request path:** a curve in the left gutter that draws from `GET /` to `200 OK` as you scroll. Each section's label comes from its `data-route` attribute.
+- **Experience rail:** the timeline fills role by role.
+- **Perspective:** cards and panels lean back until they are inside the viewport, and project cards tilt toward the pointer.
+
+With reduced motion, everything renders fully drawn and nothing animates.
 
 ## Editing Site Content
 

@@ -40,6 +40,8 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // On the home page, depth.js owns card and panel transforms.
+    const depthManaged = document.documentElement.classList.contains('has-depth');
     const easeOut = [0.16, 1, 0.3, 1];
     const inViewDefaults = { once: true, margin: '-60px 0px -40px 0px' };
 
@@ -50,11 +52,15 @@ document.addEventListener('DOMContentLoaded', () => {
             el.classList.add('scroll-hidden');
         });
 
-        document.querySelectorAll('.proj-card').forEach((el) => el.classList.add('scroll-hidden', 'scroll-scale'));
-        document.querySelectorAll('.journey-item').forEach((el) => el.classList.add('scroll-hidden', 'scroll-from-left'));
+        if (!depthManaged) {
+            document.querySelectorAll('.proj-card').forEach((el) => el.classList.add('scroll-hidden', 'scroll-scale'));
+            document.querySelectorAll('.journey-item').forEach((el) => el.classList.add('scroll-hidden', 'scroll-from-left'));
+        }
         document.querySelectorAll('.expertise__title, .expertise__tags li').forEach((el) => el.classList.add('scroll-hidden'));
-        document.querySelectorAll('.about__grid > *').forEach((el) => el.classList.add('scroll-hidden'));
-        document.querySelectorAll('.contact__panel').forEach((el) => el.classList.add('scroll-hidden', 'scroll-scale'));
+        if (!depthManaged) {
+            document.querySelectorAll('.about__grid > *').forEach((el) => el.classList.add('scroll-hidden'));
+            document.querySelectorAll('.contact__panel').forEach((el) => el.classList.add('scroll-hidden', 'scroll-scale'));
+        }
         document.querySelectorAll('.contact__header > *, .contact__actions .btn, .contact__note').forEach((el) => el.classList.add('scroll-hidden'));
         document.querySelectorAll('.blog-card').forEach((el) => el.classList.add('scroll-hidden'));
         document.querySelectorAll('.site-footer').forEach((el) => el.classList.add('scroll-hidden'));
@@ -116,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
             { ...inViewDefaults, amount: 0.35 }
         );
 
-        inView(
+        if (!depthManaged) inView(
             '.showcase-grid',
             ({ target }) => {
                 const cards = target.querySelectorAll('.proj-card');
@@ -135,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
             { ...inViewDefaults, amount: 0.15 }
         );
 
-        inView(
+        if (!depthManaged) inView(
             '.journey__list',
             ({ target }) => {
                 const items = target.querySelectorAll('.journey-item');
@@ -168,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
             { ...inViewDefaults, amount: 0.25 }
         );
 
-        inView(
+        if (!depthManaged) inView(
             '.about__grid',
             ({ target }) => {
                 const blocks = target.children;
@@ -182,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
             { ...inViewDefaults, amount: 0.2 }
         );
 
-        inView(
+        if (!depthManaged) inView(
             '.contact__panel',
             ({ target }) => {
                 animate(
