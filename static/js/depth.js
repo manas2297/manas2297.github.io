@@ -118,26 +118,8 @@
     const journey = main.querySelector('.journey__list');
     const roles = journey ? [...journey.querySelectorAll('.journey-item')] : [];
 
-    // ── Perspective targets ──
-    const tilted = [...main.querySelectorAll('.proj-card, .journey-item, .about__copy, .about__aside, .expertise, .contact__panel')].map(
-        (el) => ({ el, px: 0, py: 0, hover: false })
-    );
-    tilted
-        .filter((t) => t.el.classList.contains('proj-card'))
-        .forEach((t) => {
-            t.el.addEventListener('pointermove', (e) => {
-                const r = t.el.getBoundingClientRect();
-                t.px = (e.clientX - r.left) / r.width - 0.5;
-                t.py = (e.clientY - r.top) / r.height - 0.5;
-                t.hover = true;
-                schedule();
-            });
-            t.el.addEventListener('pointerleave', () => {
-                t.px = t.py = 0;
-                t.hover = false;
-                schedule();
-            });
-        });
+    // ── Perspective targets (project cards are animated by works-motion.js) ──
+    const tilted = [...main.querySelectorAll('.journey-item, .about__copy, .about__aside, .expertise, .contact__panel')].map((el) => ({ el }));
 
     // ── Hero stack ──
     const stackScene = document.querySelector('.stack__scene');
@@ -187,10 +169,9 @@
             tilted.forEach((t) => {
                 const r = t.el.getBoundingClientRect();
                 const enter = ease(clamp((vh - r.top) / (vh * 0.4)));
-                const rx = (1 - enter) * 16 + (t.hover ? -t.py * 8 : 0);
-                const ry = t.hover ? t.px * 10 : 0;
-                const ty = (1 - enter) * 48 + (t.hover ? -6 : 0);
-                t.el.style.transform = `perspective(1100px) translateY(${ty.toFixed(1)}px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg)`;
+                const rx = (1 - enter) * 16;
+                const ty = (1 - enter) * 48;
+                t.el.style.transform = `perspective(1100px) translateY(${ty.toFixed(1)}px) rotateX(${rx.toFixed(2)}deg)`;
                 t.el.style.opacity = (0.4 + 0.6 * enter).toFixed(3);
             });
         }

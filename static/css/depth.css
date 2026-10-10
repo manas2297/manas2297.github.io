@@ -300,7 +300,6 @@
 }
 
 /* ── Cards and panels get perspective from depth.js ── */
-.has-depth .proj-card,
 .has-depth .journey-item,
 .has-depth .about__copy,
 .has-depth .about__aside,
@@ -308,14 +307,6 @@
 .has-depth .contact__panel {
     transform-origin: 50% 100%;
     will-change: transform;
-}
-
-.has-depth .proj-card {
-    transition: box-shadow 0.3s ease, border-color 0.3s ease;
-}
-
-.has-depth .proj-card:hover {
-    box-shadow: 0 30px 50px -28px rgba(20, 23, 28, 0.35);
 }
 
 .about__portrait {

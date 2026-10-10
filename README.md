@@ -36,9 +36,10 @@ Then open: `http://localhost:8000`
 
 ## Depth & scroll effects
 
-The home page effects live in `static/js/stack3d.js` (hero model) and `static/js/depth.js` (everything else), styled by `static/css/depth.css`:
+The home page effects live in `static/js/stack3d.js` (hero model), `static/js/works-motion.js` (case-study deck) and `static/js/depth.js` (everything else):
 
 - **Hero model:** `static/js/stack3d.js` renders a lit Three.js model of the architecture: edge, Go services, Kafka partitions with live messages, and storage. The layers separate as you scroll, hovering a layer shows a real metric, and an idle cycle walks through the layers. Three.js r169 is vendored under `static/vendor/three/` and loaded through an import map, so there's no npm step. Without WebGL, the CSS-3D stack in `layouts/index.html` is shown instead.
+- **Case-study deck:** `static/js/works-motion.js` (styles in `static/css/deck.css`) uses Motion, the vanilla-JS engine behind Framer Motion, which loads from the CDN in `layouts/partials/footer.html`. Cards pin under the header and stack as you scroll, and each covered card shrinks, tips back and dims. Images unmask and the copy staggers in on arrival, and cards turn toward the mouse on a spring. Without Motion or with reduced motion, the cards still stack, just without animation.
 - **Request path:** a curve in the left gutter that draws from `GET /` to `200 OK` as you scroll. Each section's label comes from its `data-route` attribute.
 - **Experience rail:** the timeline fills role by role.
 - **Perspective:** cards and panels lean back until they are inside the viewport, and project cards tilt toward the pointer.

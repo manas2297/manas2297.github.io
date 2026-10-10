@@ -165,8 +165,9 @@
                 <p class="section-lede">Production systems across fintech, healthcare, and platform engineering — with measurable reliability and scale outcomes.</p>
             </header>
 
-            <div class="showcase-grid">
+            <div class="showcase-grid deck" id="deck">
                 {{ range (where .Site.RegularPages "Section" "works") }}
+                <div class="deck__slot">
                 <article class="proj-card">
                     <div class="proj-card__visual">
                         <img src="{{ .Params.image | relURL }}" alt="{{ .Title }}" class="proj-card__img" loading="lazy">
@@ -183,9 +184,11 @@
                         <a href="{{ .RelPermalink }}" class="proj-card__link">Read case study <i class="fa-solid fa-arrow-right-long"></i></a>
                     </div>
                 </article>
+                </div>
                 {{ end }}
 
                 {{ range $featuredProjects }}
+                <div class="deck__slot">
                 <article class="proj-card">
                     <div class="proj-card__visual">
                         <img src="{{ .image | relURL }}" alt="{{ .title }}" class="proj-card__img" loading="lazy">
@@ -202,6 +205,7 @@
                         <a href="{{ .link }}" {{ if hasPrefix .link "http" }}target="_blank" rel="noopener noreferrer"{{ end }} class="proj-card__link">{{ .link_text | default "View repository" }} <i class="fa-solid fa-arrow-right-long"></i></a>
                     </div>
                 </article>
+                </div>
                 {{ end }}
             </div>
         </section>
@@ -229,7 +233,8 @@
             </div>
         </section>
     </main>
-<script src="{{ "js/depth.js" | relURL }}?v=1.0" defer></script>
+<script src="{{ "js/depth.js" | relURL }}?v=1.1" defer></script>
+<script src="{{ "js/works-motion.js" | relURL }}?v=1.0" defer></script>
 <script type="importmap">
     {
         "imports": {
