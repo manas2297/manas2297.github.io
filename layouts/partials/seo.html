@@ -1,0 +1,143 @@
+{{- /*
+  SEO head tags: <title>, description, canonical, Open Graph, Twitter card,
+  article metadata, RSS alternate and JSON-LD. Included from head.html.
+*/ -}}
+{{- $isPost := and .IsPage (eq .Section "posts") -}}
+{{- $author := site.Params.author | default site.Title -}}
+{{- $homeURL := site.Home.Permalink -}}
+{{- $personID := printf "%s#person" $homeURL -}}
+
+{{- /* <title>: seoTitle (shorter, for search results) or the page title, plus
+       " — Site" when the whole thing still fits in ~65 characters. */ -}}
+{{- $pageTitle := site.Title -}}
+{{- if not .IsHome -}}
+  {{- $base := .Params.seoTitle | default .Title -}}
+  {{- $suffix := printf " — %s" site.Title -}}
+  {{- $pageTitle = $base -}}
+  {{- if le (add (strings.RuneCount $base) (strings.RuneCount $suffix)) 65 -}}
+    {{- $pageTitle = print $base $suffix -}}
+  {{- end -}}
+{{- end -}}
+{{- $ogTitle := cond .IsHome site.Title (cond .IsPage .Title (.Params.seoTitle | default .Title)) -}}
+{{- $desc := .Description | default site.Params.description | plainify | strings.TrimSpace -}}
+
+{{- /* Share image: page image, else the site default (portrait). */ -}}
+{{- $imgPath := .Params.image | default site.Params.defaultImage | default "img/portrait.jpg" -}}
+{{- $imgURL := $imgPath | absURL -}}
+{{- $imgW := 0 -}}{{- $imgH := 0 -}}
+{{- with partial "image-size.html" $imgPath -}}{{- $imgW = .w -}}{{- $imgH = .h -}}{{- end -}}
+{{- $imgAlt := .Params.imageAlt | default $ogTitle -}}
+
+{{- $sameAs := slice -}}
+{{- range $k, $v := site.Params.social -}}{{- $sameAs = $sameAs | append $v -}}{{- end -}}
+
+{{- $published := "" -}}{{- $modified := "" -}}
+{{- if not .Date.IsZero -}}
+  {{- $published = .Date.Format "2006-01-02T15:04:05Z07:00" -}}
+  {{- $mod := .Lastmod -}}
+  {{- if or $mod.IsZero ($mod.Before .Date) -}}{{- $mod = .Date -}}{{- end -}}
+  {{- $modified = $mod.Format "2006-01-02T15:04:05Z07:00" -}}
+{{- end }}
+    <title>{{ $pageTitle }}</title>
+    <meta name="description" content="{{ $desc }}">
+    <meta name="author" content="{{ $author }}">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <link rel="canonical" href="{{ .Permalink }}">
+    {{- with site.GetPage "/posts" }}{{ with .OutputFormats.Get "rss" }}
+    <link rel="alternate" type="application/rss+xml" href="{{ .Permalink }}" title="{{ site.Title }} — Blog">
+    {{- end }}{{ end }}
+
+    <meta property="og:site_name" content="{{ site.Title }}">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:type" content="{{ if $isPost }}article{{ else }}website{{ end }}">
+    <meta property="og:title" content="{{ $ogTitle }}">
+    <meta property="og:description" content="{{ $desc }}">
+    <meta property="og:url" content="{{ .Permalink }}">
+    <meta property="og:image" content="{{ $imgURL }}">
+    {{- if $imgW }}
+    <meta property="og:image:width" content="{{ $imgW }}">
+    <meta property="og:image:height" content="{{ $imgH }}">
+    {{- end }}
+    <meta property="og:image:alt" content="{{ $imgAlt }}">
+    {{- if $isPost }}
+    <meta property="article:published_time" content="{{ $published }}">
+    <meta property="article:modified_time" content="{{ $modified }}">
+    <meta property="article:author" content="{{ $homeURL }}">
+    {{- with .Params.category }}
+    <meta property="article:section" content="{{ . }}">
+    {{- end }}
+    {{- range .Params.tags }}
+    <meta property="article:tag" content="{{ . }}">
+    {{- end }}
+    {{- end }}
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $ogTitle }}">
+    <meta name="twitter:description" content="{{ $desc }}">
+    <meta name="twitter:image" content="{{ $imgURL }}">
+    <meta name="twitter:image:alt" content="{{ $imgAlt }}">
+
+{{- /* JSON-LD structured data */ -}}
+{{- $person := dict
+  "@type" "Person"
+  "@id" $personID
+  "name" $author
+  "url" $homeURL
+  "jobTitle" (site.Params.authorJobTitle | default site.Params.headerRole)
+  "image" ((site.Params.hero.portraitSrc | default site.Params.defaultImage) | absURL)
+  "sameAs" $sameAs
+-}}
+{{- $ld := dict -}}
+{{- if $isPost -}}
+  {{- $image := dict "@type" "ImageObject" "url" $imgURL -}}
+  {{- if $imgW }}{{ $image = merge $image (dict "width" $imgW "height" $imgH) }}{{ end -}}
+  {{- $post := dict
+    "@type" "BlogPosting"
+    "@id" (printf "%s#article" .Permalink)
+    "headline" .Title
+    "description" $desc
+    "image" $image
+    "url" .Permalink
+    "datePublished" $published
+    "dateModified" $modified
+    "author" $person
+    "publisher" (dict "@id" $personID)
+    "mainEntityOfPage" (dict "@type" "WebPage" "@id" .Permalink)
+    "inLanguage" "en-US"
+    "wordCount" .WordCount
+  -}}
+  {{- with .Params.tags }}{{ $post = merge $post (dict "keywords" (delimit . ", ")) }}{{ end -}}
+  {{- with .Params.category }}{{ $post = merge $post (dict "articleSection" .) }}{{ end -}}
+  {{- $crumbs := slice (dict "@type" "ListItem" "position" 1 "name" "Home" "item" $homeURL) -}}
+  {{- with site.GetPage "/posts" -}}
+    {{- $crumbs = $crumbs | append (dict "@type" "ListItem" "position" 2 "name" "Blog" "item" .Permalink) -}}
+  {{- end -}}
+  {{- $crumbs = $crumbs | append (dict "@type" "ListItem" "position" (add (len $crumbs) 1) "name" .Title "item" .Permalink) -}}
+  {{- $ld = dict "@context" "https://schema.org" "@graph" (slice $post (dict "@type" "BreadcrumbList" "itemListElement" $crumbs)) -}}
+{{- else if .IsHome -}}
+  {{- $site := dict
+    "@type" "WebSite"
+    "@id" (printf "%s#website" $homeURL)
+    "name" site.Title
+    "url" $homeURL
+    "description" $desc
+    "inLanguage" "en-US"
+    "publisher" (dict "@id" $personID)
+  -}}
+  {{- $ld = dict "@context" "https://schema.org" "@graph" (slice $person $site) -}}
+{{- else if and .IsSection (eq .Section "posts") -}}
+  {{- $ld = dict
+    "@context" "https://schema.org"
+    "@type" "Blog"
+    "@id" (printf "%s#blog" .Permalink)
+    "name" (.Params.seoTitle | default .Title)
+    "description" $desc
+    "url" .Permalink
+    "inLanguage" "en-US"
+    "author" $person
+    "publisher" (dict "@id" $personID)
+  -}}
+{{- end -}}
+{{- if $ld }}
+    <script type="application/ld+json">{{ $ld | jsonify | safeJS }}</script>
+{{- end }}

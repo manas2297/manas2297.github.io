@@ -7,7 +7,7 @@ tags: ["Go", "Kafka", "Concurrency", "Performance"]
 image: "img/go_event_streams.jpg"
 featured: false
 aliases: ["/posts/hello-world/"]
-description: "How to structure a Go Kafka pipeline that stays fast under load: key-sharded workers that keep ordering, bounded channels for backpressure, and letting the client do the batching."
+description: "How to build a Go Kafka pipeline that stays fast under load: key-sharded workers that keep ordering, bounded channels for backpressure, and client batching."
 ---
 
 Most Go Kafka services start out as a consumer loop, a channel, and a handful of goroutines reading from it. Fine at a few hundred messages a second. At tens of thousands, ordering breaks, memory climbs, and latency gets spiky in ways dashboards don't explain.

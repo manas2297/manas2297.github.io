@@ -1,12 +1,13 @@
 ---
 title: "Go Performance Debugging: A Practical Guide to pprof, Traces, and the GC"
+seoTitle: "Go Performance Debugging with pprof, Traces, and GC Tuning"
 date: 2026-09-09
 category: "Performance"
 tag: "Go Performance"
 tags: ["Go", "pprof", "Profiling", "Garbage Collection", "Performance"]
 image: "img/blog/go-performance-debugging-pprof.jpg"
 featured: false
-description: "A hands-on workflow for debugging slow Go services: CPU and heap profiles with pprof, block and mutex profiles, the execution tracer, GC tuning with GOGC and GOMEMLIMIT, and GOMAXPROCS in containers."
+description: "A hands-on Go performance debugging workflow: CPU and heap profiles with pprof, block and mutex profiles, the execution tracer, and GC tuning with GOMEMLIMIT."
 ---
 
 Go makes it easy to write fast code. It also makes it easy to write code that's slow for reasons you'll never spot by reading it. The tooling to find out *why* ships with the language and is safe to run in production. Most teams barely touch it.

@@ -6,7 +6,7 @@ tag: "Architecture & Scale"
 tags: ["Redis", "PostgreSQL", "Distributed Systems", "Locks", "Kubernetes"]
 image: "img/redis_locks.jpg"
 featured: false
-description: "Why sync.Mutex stops working once you scale out, how to build a safe Redis lock with tokens and atomic release, why fencing tokens matter, and when you don't need a lock at all."
+description: "Distributed locking patterns for scaled-out services: safe Redis locks with tokens and atomic release, fencing tokens, and when you don't need a lock."
 ---
 
 A `sync.Mutex` protects memory inside one process. The moment you run three replicas of a service on Kubernetes, each pod has its own mutex, and they know nothing about each other. If two pods pick up work for the same customer at the same time, the mutex does nothing to stop them.

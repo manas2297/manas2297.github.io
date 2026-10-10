@@ -1,12 +1,13 @@
 ---
 title: "Kafka Internals: Logs, Segments, Replication, and the ISR Explained"
+seoTitle: "Kafka Internals: Logs, Segments, Replication, and the ISR"
 date: 2026-09-16
 category: "Distributed Systems"
 tag: "Kafka Internals"
 tags: ["Kafka", "Distributed Systems", "Replication", "Event Streaming"]
 image: "img/blog/kafka-internals-log-replication-isr.jpg"
 featured: false
-description: "How Kafka actually stores and replicates data: partitions as append-only logs, segments and indexes, the page cache, leaders and the ISR, the high watermark, idempotent producers, transactions, and KRaft."
+description: "Kafka internals explained: partitions as append-only logs, segments and indexes, leaders and the ISR, the high watermark, idempotent producers, and KRaft."
 ---
 
 Kafka is easy to use and hard to operate well. Nearly all of the gap is internals. Once you know how a partition sits on disk and how replicas agree on what's committed, most of the config options stop looking like magic. They turn into fairly obvious trade-offs.

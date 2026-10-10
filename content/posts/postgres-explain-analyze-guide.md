@@ -1,12 +1,13 @@
 ---
 title: "Reading PostgreSQL EXPLAIN ANALYZE: A Backend Engineer's Guide to Slow Queries"
+seoTitle: "PostgreSQL EXPLAIN ANALYZE: A Guide to Fixing Slow Queries"
 date: 2026-09-28
 category: "Databases"
 tag: "PostgreSQL Performance"
 tags: ["PostgreSQL", "SQL", "Query Optimization", "Indexes", "Performance"]
 image: "img/blog/postgres-explain-analyze-guide.jpg"
 featured: false
-description: "How to read PostgreSQL query plans with EXPLAIN (ANALYZE, BUFFERS), spot bad row estimates, choose the right index, and fix the slow-query patterns backend services hit most."
+description: "How to read PostgreSQL EXPLAIN ANALYZE plans with BUFFERS, spot bad row estimates, choose the right index, and fix the slow queries backend services hit most."
 ---
 
 Most slow API endpoints I've looked at weren't slow because of application code. They were slow because of one query, and that query was slow because Postgres picked a plan nobody expected. `EXPLAIN ANALYZE` shows you that plan. Reading it well is one of the most useful skills a backend engineer can pick up.

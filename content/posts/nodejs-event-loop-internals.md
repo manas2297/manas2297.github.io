@@ -6,7 +6,7 @@ tag: "Node.js Internals"
 tags: ["Node.js", "libuv", "Event Loop", "Performance"]
 image: "img/blog/nodejs-event-loop-internals.jpg"
 featured: false
-description: "A practical tour of the Node.js event loop: libuv phases, microtasks vs process.nextTick, the libuv thread pool, and the mistakes that block every request in your service."
+description: "A practical tour of Node.js event loop internals: libuv phases, microtasks vs process.nextTick, the libuv thread pool, and mistakes that block every request."
 ---
 
 "Node is single-threaded" is one of those statements that's true enough to repeat and wrong enough to cause outages. Your JavaScript runs on one thread. Node itself doesn't. Knowing where that line sits is the difference between a service that handles 10k concurrent connections calmly and one that falls over the first time someone uploads a big JSON file.

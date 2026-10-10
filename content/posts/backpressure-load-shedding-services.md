@@ -1,12 +1,13 @@
 ---
 title: "Backpressure and Load Shedding: Keeping Services Alive Under Overload"
+seoTitle: "Backpressure and Load Shedding for Go and Node.js Services"
 date: 2026-10-06
 category: "Reliability"
 tag: "Overload Protection"
 tags: ["Reliability", "Go", "Node.js", "Backpressure", "Load Shedding", "Little's Law"]
 image: "img/blog/backpressure-load-shedding-services.jpg"
 featured: false
-description: "Why unbounded queues turn overload into outages, how Little's Law explains it, and practical ways to add backpressure, concurrency limits, and load shedding to Go and Node.js services."
+description: "Why unbounded queues turn overload into outages, and how to add backpressure, concurrency limits, and load shedding to Go and Node.js services."
 ---
 
 Services rarely die from a bit more traffic than they can handle. They die because they *accept* that traffic, queue it up, and then serve every request slowly instead of serving most of them quickly. Latency climbs. Clients time out and retry, the queue grows faster, and before long the service is busy working on requests nobody is waiting for anymore.

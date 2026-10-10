@@ -6,7 +6,7 @@ tag: "Kubernetes Operations"
 tags: ["Kubernetes", "Go", "Node.js", "Graceful Shutdown", "Deployments"]
 image: "img/blog/graceful-shutdown-kubernetes-go-nodejs.jpg"
 featured: false
-description: "Why rolling deploys drop requests even with readiness probes, how pod termination really works, and a step-by-step graceful shutdown for Go and Node.js services, including Kafka consumers."
+description: "Why rolling deploys drop requests, how Kubernetes pod termination really works, and a step-by-step graceful shutdown for Go and Node.js services."
 ---
 
 Does your error rate tick up a little on every deploy? That's probably not a bug in the new version. It's a shutdown problem. A handful of `502`s and connection resets per rollout is so common that lots of teams treat it as normal. It isn't, and the fix is mostly plumbing.

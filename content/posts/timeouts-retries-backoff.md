@@ -1,12 +1,13 @@
 ---
 title: "Timeouts, Retries, and Backoff: How to Call Other Services Without Causing an Outage"
+seoTitle: "Timeouts, Retries, and Backoff Without Causing an Outage"
 date: 2026-10-04
 category: "Reliability"
 tag: "Resilience Patterns"
 tags: ["Reliability", "Microservices", "Go", "Retries", "Circuit Breaker"]
 image: "img/blog/timeouts-retries-backoff.jpg"
 featured: false
-description: "How to set timeouts from real latency data, propagate deadlines, retry with exponential backoff and jitter, cap retries with budgets, and avoid the retry storms that turn a small blip into a full outage."
+description: "How to set timeouts from real latency data, retry with exponential backoff and jitter, cap retries with budgets, and avoid retry storms that cause outages."
 ---
 
 A network call can fail fast, fail slowly, or never come back. Failing fast is the easy case. The other two cause outages. A missing timeout ties up resources until the process runs out, and a naive retry takes a struggling dependency and hits it three times harder while it's down.

@@ -1,0 +1,9 @@
+{{- /* Returns dict "w"/"h" for an image under static/ (e.g. "img/blog/x.jpg"), or nil. */ -}}
+{{- $out := false -}}
+{{- with . -}}
+  {{- $file := path.Join "static" . -}}
+  {{- if fileExists $file -}}
+    {{- with imageConfig $file -}}{{- $out = dict "w" .Width "h" .Height -}}{{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- return $out -}}

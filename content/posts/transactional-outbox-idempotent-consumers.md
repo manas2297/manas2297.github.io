@@ -1,12 +1,13 @@
 ---
 title: "The Transactional Outbox Pattern and Idempotent Consumers, Explained"
+seoTitle: "Transactional Outbox Pattern and Idempotent Consumers"
 date: 2026-10-01
 category: "Distributed Systems"
 tag: "Event-Driven Design"
 tags: ["Outbox Pattern", "Kafka", "PostgreSQL", "Idempotency", "Microservices"]
 image: "img/blog/transactional-outbox-idempotent-consumers.jpg"
 featured: false
-description: "Why writing to your database and publishing to Kafka in the same request is a bug, how the transactional outbox pattern fixes it, and how to build idempotent consumers that make at-least-once delivery safe."
+description: "Why writing to your database and publishing to Kafka together breaks, how the transactional outbox pattern fixes it, and how to build idempotent consumers."
 ---
 
 This looks completely reasonable. It's quietly broken:
@@ -83,7 +84,7 @@ FOR UPDATE SKIP LOCKED;
 
 `SKIP LOCKED` lets several publisher instances run without picking up the same rows. After the batch is acknowledged by Kafka, set `published_at` (or delete the rows) and commit.
 
-Polling is simple and works with any database. You pay a small delay (the poll interval) and some extra database load. Clean up published rows regularly or the table grows forever.
+Polling is simple and works with any database. You pay a small delay (the poll interval) and some extra database load; the partial index above keeps that poll query cheap, and [`EXPLAIN ANALYZE`](/posts/postgres-explain-analyze-guide/) will confirm it's actually being used. Clean up published rows regularly or the table grows forever.
 
 ### Change data capture
 

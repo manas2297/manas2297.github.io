@@ -1,12 +1,13 @@
 ---
 title: "Kafka at Scale: Partitions, Consumer Lag, Rebalancing, and Running It in Production"
+seoTitle: "Kafka at Scale: Partitions, Consumer Lag, and Rebalancing"
 date: 2026-09-23
 category: "Distributed Systems"
 tag: "Kafka at Scale"
 tags: ["Kafka", "Event Streaming", "Scalability", "Consumer Groups", "Operations"]
 image: "img/blog/kafka-at-scale-partitions-consumers-rebalancing.jpg"
 featured: false
-description: "Practical lessons for running Kafka at high throughput: sizing partitions, handling hot keys, measuring consumer lag, avoiding rebalance storms with cooperative and static membership, producer tuning, and keeping brokers balanced."
+description: "Running Kafka at scale: sizing partitions, handling hot keys, measuring consumer lag, avoiding rebalance storms, tuning producers, and balancing brokers."
 ---
 
 Kafka will take almost anything you throw at it on day one. The trouble comes later. A topic can't keep up because it has too few partitions. Consumers stop for 30 seconds every time a pod restarts. One broker runs hot while the rest idle. Nothing exotic, just the defaults meeting real traffic.

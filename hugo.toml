@@ -2,6 +2,34 @@ baseURL = 'https://manas2297.github.io/'
 locale = 'en-us'
 title = 'Manas Yadav'
 
+# SEO: robots.txt (layouts/robots.txt points crawlers at the sitemap) and
+# last-modified dates from git history (CI checks out with fetch-depth 0).
+enableRobotsTXT = true
+enableGitInfo = true
+
+# Tags/categories are plain front matter used for cards, keywords and related
+# posts. No layout exists for taxonomy pages, so don't generate thin,
+# duplicate /tags/* and /categories/* pages.
+disableKinds = ['taxonomy', 'term']
+
+[frontmatter]
+  lastmod = ['lastmod', ':git', 'date']
+
+[sitemap]
+  changeFreq = 'monthly'
+
+# "Related articles" at the end of each post (.Site.RegularPages.Related).
+[related]
+  includeNewer = true
+  threshold = 20
+  toLower = true
+  [[related.indices]]
+    name = 'tags'
+    weight = 100
+  [[related.indices]]
+    name = 'category'
+    weight = 60
+
 [markup]
   [markup.goldmark]
     [markup.goldmark.renderer]
@@ -20,6 +48,9 @@ title = 'Manas Yadav'
   availabilityBadge = 'Open to lead, staff, and principal engineering roles'
   menuButtonLabel = 'Menu'
   copyrightLine = '© 2026 Manas Yadav'
+  author = 'Manas Yadav'
+  authorJobTitle = 'Lead Backend Engineer'
+  defaultImage = 'img/portrait.jpg' # og:image fallback when a page has no image
 
   [params.social]
     github = 'https://github.com/manas2297'

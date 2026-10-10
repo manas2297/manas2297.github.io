@@ -1,12 +1,13 @@
 ---
 title: "Event Loop Lag in Node.js: Using It to Debug Performance and CPU Throttling"
+seoTitle: "Node.js Event Loop Lag: Debug Performance and CPU Throttling"
 date: 2026-09-02
 category: "Performance"
 tag: "Node.js Performance"
 tags: ["Node.js", "Event Loop", "Kubernetes", "CPU Throttling", "Observability"]
 image: "img/blog/nodejs-event-loop-lag-cpu-throttling.jpg"
 featured: true
-description: "How to measure Node.js event loop lag with perf_hooks, read it alongside event loop utilization, and use it to tell CPU-bound code apart from Kubernetes CFS throttling and GC pauses."
+description: "Measure Node.js event loop lag with perf_hooks, read it with event loop utilization, and use it to tell CPU-bound code from Kubernetes CPU throttling and GC."
 ---
 
 A slow Node.js service sends most people straight to request latency and downstream calls. Reasonable, but it misses the most common Node-specific failure, which is the event loop itself falling behind. When that happens *every* request in the process slows down at once, including the ones that do nothing expensive.
