@@ -9,13 +9,13 @@ featured: false
 description: "How to set timeouts from real latency data, propagate deadlines, retry with exponential backoff and jitter, cap retries with budgets, and avoid the retry storms that turn a small blip into a full outage."
 ---
 
-Every network call your service makes can fail in three ways: it errors quickly, it errors slowly, or it never comes back. The first is easy. The other two are where outages come from. A missing timeout ties up resources until the process runs out of them. A naive retry turns one struggling dependency into a dependency that's being hit three times harder while it's down.
+A network call can fail fast, fail slowly, or never come back. Failing fast is the easy case. The other two cause outages. A missing timeout ties up resources until the process runs out, and a naive retry takes a struggling dependency and hits it three times harder while it's down.
 
-Timeouts and retries are some of the most copy-pasted code in any backend. They're also some of the most dangerous to get wrong. Here's how I think about them.
+Timeout and retry logic gets copy-pasted around every backend I've seen, and it's dangerous to get wrong. Here's how I think about it.
 
 ## Every call needs a timeout
 
-The default in many HTTP clients is no timeout at all. In Go, a zero-value `http.Client{}` will wait forever. So the first rule is simple: never make a network call without a deadline.
+Plenty of HTTP clients default to no timeout at all. In Go, a zero-value `http.Client{}` will wait forever. Rule one: never make a network call without a deadline.
 
 ```go
 var client = &http.Client{
@@ -35,13 +35,13 @@ func GetUser(ctx context.Context, id string) (*User, error) {
 }
 ```
 
-The same applies to database queries, Redis calls, and Kafka produce calls. Anything that crosses a network.
+Same for database queries, Redis calls, Kafka produce calls. Anything that crosses a network.
 
 ## Pick timeouts from data, not round numbers
 
-"Five seconds feels safe" is how most timeouts are chosen. It's usually wrong in both directions: too long to protect you, and not tied to what the dependency actually does.
+Most timeouts get chosen because "five seconds feels safe." That's too long to protect you, and it has nothing to do with how the dependency actually behaves.
 
-A better starting point:
+Start from data instead:
 
 1. Look at the dependency's latency distribution under normal load.
 2. Set the timeout a bit above its p99 or p99.9. If p99 is 80ms, a 250 to 300ms timeout catches genuinely stuck calls without cutting off normal slow ones.
@@ -49,25 +49,25 @@ A better starting point:
 
 ## Propagate deadlines
 
-Timeouts set independently at each hop don't add up correctly. Say service A has a 1-second budget and calls B, which calls C with its own 2-second timeout. A gives up after 1 second, but C keeps working for another second on a request nobody is waiting for anymore.
+Timeouts set independently at each hop don't compose. Say service A has a 1-second budget and calls B, which calls C with its own 2-second timeout. A gives up after 1 second. C keeps working for another second on a request nobody is waiting for.
 
-**Deadline propagation** fixes this. Pass the remaining time along with the request, and have every hop respect it. In Go this happens naturally if you pass the incoming request's `context.Context` all the way down instead of creating fresh ones from `context.Background()`. gRPC propagates deadlines across services automatically. For HTTP, you can send the remaining budget in a header and have the callee build its context from it.
+Deadline propagation fixes this: pass the remaining time along with the request and have every hop respect it. In Go this happens naturally if you pass the incoming request's `context.Context` all the way down instead of creating fresh ones from `context.Background()`. gRPC propagates deadlines across services automatically. For HTTP, you can send the remaining budget in a header and have the callee build its context from it.
 
-A useful extra: if the remaining deadline is already shorter than the minimum time a call could take, fail fast instead of starting work that can't finish.
+One small extra that's worth it: if the remaining deadline is already shorter than the fastest the call could possibly be, fail now instead of starting work that can't finish.
 
 ## Only retry what's safe to retry
 
-Before adding retries, ask two questions.
+Two questions before adding retries.
 
-**Is the operation idempotent?** Retrying a `GET` is safe. Retrying "charge this card" without an idempotency key can charge it twice. A timeout doesn't tell you whether the request failed, only that you didn't get an answer. The server might have done the work. (I cover idempotency keys in the [outbox and idempotent consumers](/posts/transactional-outbox-idempotent-consumers/) post.)
+**Is the operation idempotent?** Retrying a `GET` is safe. Retrying "charge this card" without an idempotency key can charge it twice. A timeout doesn't tell you the request failed, only that you didn't get an answer. The server may well have done the work. (I cover idempotency keys in the [outbox and idempotent consumers](/posts/transactional-outbox-idempotent-consumers/) post.)
 
-**Is the error retryable?** Retry on connection errors, timeouts, `503`, and `429` (respecting `Retry-After`). Don't retry `400`, `401`, `404`, or validation errors. They'll fail the same way every time.
+**Is the error retryable?** Retry connection errors, timeouts, `503`, and `429` (respecting `Retry-After`). Don't retry `400`, `401`, `404`, or validation errors; they'll fail the same way every time.
 
 ## Exponential backoff with jitter
 
-Retrying immediately just adds load to a dependency that's already struggling. Retrying at fixed intervals is a bit better, but if a thousand clients failed at the same moment, they'll all retry at the same moment too. You've created a synchronized wave.
+Retrying immediately just piles load onto a dependency that's already struggling. Fixed intervals are a bit better, but a thousand clients that failed together will retry together. That's a synchronized wave.
 
-The standard fix is **exponential backoff with jitter**: wait longer after each attempt, and randomize the wait so clients spread out.
+The standard fix is exponential backoff with jitter. Wait longer after each attempt, and randomize the wait so clients spread out.
 
 ```go
 func backoff(attempt int, base, max time.Duration) time.Duration {
@@ -96,27 +96,23 @@ func withRetry(ctx context.Context, attempts int, fn func(context.Context) error
 
 "Full jitter" picks a random wait between zero and the exponential cap. It looks odd at first, because some retries happen almost immediately, but AWS's well-known analysis of backoff strategies found it spreads load out far better than adding a little noise to a fixed schedule.
 
-Keep the attempt count small. Two or three total attempts is plenty for most calls.
+Keep attempts low. Two or three in total is plenty for most calls.
 
 ## Retries multiply across layers
 
-This is the part that causes real outages. Suppose a request passes through three services, and each one tries up to 3 times. When the bottom service fails, the middle one tries 3 times, and the top one retries the middle one 3 times. That's 3 × 3 × 3 = **27 attempts** hitting the bottom service for every one user request. Just as it's struggling to recover.
+This is the part that causes real outages. A request passes through three services, and each tries up to 3 times. When the bottom service fails, the middle one tries 3 times, and the top one retries the middle one 3 times. That's 3 × 3 × 3 = 27 attempts on the bottom service for every user request, right when it's trying to recover.
 
-Ways to keep this under control:
-
-- **Retry at one layer only.** Usually the one closest to the user or the one that knows the operation is safe. Inner layers fail fast.
-- **Use a retry budget.** Allow retries only while they're a small fraction of total traffic, say 10%. When a dependency is really down, retries stop automatically instead of tripling load. gRPC's retry throttling works this way.
-- **Respect the deadline.** With deadline propagation, retries stop on their own when the time is gone.
+To keep it under control, retry at one layer only, usually the one closest to the user or the one that knows the operation is safe. Inner layers fail fast. Put retries under a budget too: allow them only while they're a small fraction of total traffic, say 10%, so when a dependency is really down they stop instead of tripling load. gRPC's retry throttling works this way. And with deadlines propagated, retries stop on their own once the time is gone.
 
 ## Circuit breakers
 
-A circuit breaker tracks recent failures to a dependency. When the failure rate crosses a threshold, it **opens** and fails calls immediately without sending them, for a cool-down period. Then it lets a few trial requests through (**half-open**). If they succeed, it closes again.
+A circuit breaker tracks recent failures to a dependency. Past a failure-rate threshold it opens, failing calls immediately without sending them, for a cool-down period. Then it lets a few trial requests through (half-open). If those succeed, it closes again.
 
-It protects both sides. Your service stops wasting threads, connections, and latency budget on calls that will fail. The dependency gets breathing room to recover. Pair it with a fallback where one makes sense: a cached value, a default, or a degraded response.
+Both sides win. Your service stops burning threads, connections, and latency budget on calls that will fail, and the dependency gets room to recover. Pair it with a fallback where one makes sense, like a cached value or a degraded response.
 
 ## Hedged requests for tail latency
 
-For idempotent reads, there's one more tool. If a request hasn't come back by roughly the dependency's p95, send a second copy to another replica and use whichever answers first. Google's "The Tail at Scale" paper describes this technique. It can cut tail latency sharply for a small increase in load. Only hedge reads that are safe to duplicate, and cap how many hedges you send.
+Idempotent reads get one more tool. If a request hasn't come back by roughly the dependency's p95, send a second copy to another replica and take whichever answers first. Google's "The Tail at Scale" paper describes it. It can cut tail latency sharply for a small increase in load. Only hedge reads that are safe to duplicate, and cap how many hedges you send.
 
 ## Checklist
 
@@ -127,4 +123,4 @@ For idempotent reads, there's one more tool. If a request hasn't come back by ro
 - Retries happen at one layer, under a budget.
 - Circuit breakers guard dependencies that can fail hard.
 
-Timeouts and retries protect you from *other* services. The companion problem is protecting your own service from too much incoming work, which I cover in [backpressure and load shedding](/posts/backpressure-load-shedding-services/).
+All of this protects you from *other* services. Protecting your own service from too much incoming work is the other half, covered in [backpressure and load shedding](/posts/backpressure-load-shedding-services/).

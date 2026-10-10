@@ -9,7 +9,7 @@ featured: false
 description: "Why writing to your database and publishing to Kafka in the same request is a bug, how the transactional outbox pattern fixes it, and how to build idempotent consumers that make at-least-once delivery safe."
 ---
 
-Here's a piece of code that looks completely reasonable and is quietly broken:
+This looks completely reasonable. It's quietly broken:
 
 ```go
 func PlaceOrder(ctx context.Context, o Order) error {
@@ -20,13 +20,13 @@ func PlaceOrder(ctx context.Context, o Order) error {
 }
 ```
 
-If the process crashes, the network blips, or Kafka is briefly unavailable between those two lines, the order exists in the database but the event never goes out. Downstream, the warehouse never ships it and the email never sends. Swap the order of the calls and you get the opposite problem: an event for an order that was never saved.
+If the process crashes, the network blips, or Kafka is briefly unavailable between those two lines, the order exists but the event never goes out. The warehouse never ships it. The email never sends. Swap the calls around and you get the opposite: an event for an order that was never saved.
 
-This is the **dual-write problem**. You're trying to update two systems atomically, and there's no transaction that spans both. Retries don't save you either, because you can't tell whether the first attempt partly succeeded.
+That's the dual-write problem. You want to update two systems atomically and no transaction spans both. Retries don't help, because you can't tell whether the first attempt partly succeeded.
 
 ## The outbox pattern
 
-The fix is to stop writing to two systems in the request path. Write to **one**, your database, and let a separate process handle publishing.
+Stop writing to two systems in the request path. Write to *one*, your database, and let a separate process do the publishing.
 
 In the same transaction that saves the business data, insert a row into an `outbox` table describing the event:
 
@@ -62,11 +62,11 @@ func PlaceOrder(ctx context.Context, o Order) error {
 }
 ```
 
-Now the order and its event are committed together or not at all. The database transaction gives you the atomicity you couldn't get across two systems.
+The order and its event now commit together or not at all. The database transaction gives you the atomicity you couldn't get across two systems.
 
 ## Getting events out of the outbox
 
-Something has to move rows from the outbox to Kafka. There are two common ways.
+Something has to move rows from the outbox to Kafka. Two common ways to do it.
 
 ### Polling publisher
 
@@ -83,31 +83,31 @@ FOR UPDATE SKIP LOCKED;
 
 `SKIP LOCKED` lets several publisher instances run without picking up the same rows. After the batch is acknowledged by Kafka, set `published_at` (or delete the rows) and commit.
 
-Polling is simple and works with any database. The costs are a small delay (your poll interval) and some extra load on the database. Clean up published rows regularly so the table doesn't grow forever.
+Polling is simple and works with any database. You pay a small delay (the poll interval) and some extra database load. Clean up published rows regularly or the table grows forever.
 
 ### Change data capture
 
-Instead of polling, read the database's write-ahead log. Tools like [Debezium](https://debezium.io/) stream inserts on the outbox table straight into Kafka, and Debezium even ships an outbox event router for exactly this pattern. You get lower latency and no polling queries. The trade-off is another piece of infrastructure to run and monitor, plus some care around replication slots in Postgres: a slot that nobody reads keeps WAL around until the disk fills.
+Or skip polling and read the database's write-ahead log. Tools like [Debezium](https://debezium.io/) stream inserts on the outbox table straight into Kafka, and Debezium even ships an outbox event router for this exact pattern. Lower latency, no polling queries. In exchange you run and monitor another piece of infrastructure, and you have to be careful with Postgres replication slots: a slot nobody reads keeps WAL around until the disk fills.
 
-My rule of thumb: start with polling. Move to CDC when latency or database load actually becomes a problem.
+I'd start with polling and move to CDC when latency or database load actually becomes a problem.
 
 ## The catch: at-least-once delivery
 
-Either way, the publisher can crash after publishing a batch and before marking it published. On restart, it publishes those events again. The outbox pattern guarantees every event goes out **at least once**, not exactly once.
+Either way, the publisher can crash after publishing a batch but before marking it published. On restart it publishes those events again. The outbox guarantees every event goes out *at least once*, not exactly once.
 
-That's not a flaw you can engineer away cheaply. It's the normal state of distributed messaging. Kafka consumers have the same property: if a consumer processes a message and crashes before committing the offset, it'll see that message again. So the other half of this pattern is making consumers safe to run twice.
+You can't cheaply engineer that away. It's just how distributed messaging works. Kafka consumers have the same property: if a consumer processes a message and crashes before committing the offset, it'll see that message again. So the other half of this pattern is making consumers safe to run twice.
 
 ## Idempotent consumers
 
-An operation is **idempotent** if doing it twice has the same effect as doing it once. There are a few ways to get there.
+An operation is idempotent if doing it twice has the same effect as doing it once. A few ways to get there:
 
 ### Natural idempotency
 
-Some operations already are. "Set order status to shipped" can run ten times with the same result. "Add 1 to the shipped count" can't. Where you can, design events and handlers around setting state rather than applying deltas.
+Some operations already are. "Set order status to shipped" can run ten times with the same result; "add 1 to the shipped count" can't. Where possible, design events and handlers around setting state rather than applying deltas.
 
 ### Deduplication table
 
-For everything else, record which events you've processed, in the **same transaction** as the side effect:
+For everything else, record which events you've processed, in the *same transaction* as the side effect:
 
 ```sql
 CREATE TABLE processed_events (
@@ -143,31 +143,31 @@ func Handle(ctx context.Context, ev Event) error {
 }
 ```
 
-The insert and the side effect commit together. If the handler crashes halfway, both roll back and the retry starts clean. If the event is a duplicate, the insert does nothing and the handler exits.
+The insert and the side effect commit together. Crash halfway and both roll back, so the retry starts clean. A duplicate event makes the insert a no-op and the handler exits.
 
-The event ID has to come from the producer, which is why the outbox row has its own `id`. Generate it once, when the event is created, and carry it through.
+The event ID has to come from the producer. That's why the outbox row has its own `id`: generate it once, when the event is created, and carry it through.
 
 ### Side effects outside your database
 
-If the handler calls an external API, like a payment provider, you can't put that call in your transaction. Pass an **idempotency key** derived from the event ID instead. Most payment APIs support this: the provider remembers the key and returns the original result for repeat requests. If a downstream doesn't support it, you need your own state machine (pending, sent, confirmed) to know whether a retry is safe.
+A call to an external API, like a payment provider, can't go inside your transaction. Pass an idempotency key derived from the event ID instead. Most payment APIs support this: the provider remembers the key and returns the original result for repeats. If a downstream doesn't, you need your own state machine (pending, sent, confirmed) to know whether a retry is safe.
 
 ## Ordering
 
-Two practical points if order matters:
+If order matters:
 
 - **Use the aggregate ID as the Kafka key.** All events for `order-42` go to the same partition and stay in order.
-- **Publish in commit order per aggregate.** A single polling publisher reading in `created_at` order is the simplest way. With multiple publishers, make sure events for the same aggregate don't get split across them.
+- **Publish in commit order per aggregate.** A single polling publisher reading in `created_at` order is the simplest way, with one catch: `now()` is the transaction's *start* time, so rows can commit out of `created_at` order. That's fine as long as writes to the same aggregate are serialized (for example, because they all update the aggregate's row first). With multiple publishers, make sure events for the same aggregate don't get split across them.
 
-Even then, consumers should be able to handle an older event arriving after a newer one, for example by storing a version number and ignoring events with a lower version than what's already applied. It's the same idea as the fencing tokens in my post on [distributed locking](/posts/distributed-locking-patterns/).
+Even then, consumers should cope with an older event arriving after a newer one. Store a version number and ignore events with a lower version than what's already applied. Same idea as the fencing tokens in my post on [distributed locking](/posts/distributed-locking-patterns/).
 
 ## What about Kafka transactions?
 
-Kafka's exactly-once semantics work well for pipelines that read from Kafka and write back to Kafka. They don't help with the dual write between your database and Kafka, because your database can't take part in a Kafka transaction. The outbox is still the answer there. I go into how Kafka transactions work in [Kafka internals](/posts/kafka-internals-log-replication-isr/).
+Kafka's exactly-once semantics work well for pipelines that read from Kafka and write back to Kafka. They do nothing for the dual write between your database and Kafka, because your database can't join a Kafka transaction. You still need the outbox. How Kafka transactions work is covered in [Kafka internals](/posts/kafka-internals-log-replication-isr/).
 
 ## Takeaways
 
-- Writing to a database and a broker in the same request isn't atomic. Something will eventually get lost.
+- Writing to a database and a broker in one request isn't atomic. Eventually something gets lost.
 - Write the event to an outbox table in the same transaction as the business data.
-- Publish from the outbox by polling (simple) or CDC (lower latency, more infrastructure).
-- Delivery is at least once. Make consumers idempotent with natural idempotency, a dedup table in the same transaction, or idempotency keys.
-- Key by aggregate ID and version your events if order matters.
+- Publish by polling (simple) or CDC (lower latency, more infrastructure).
+- Delivery is at least once, so consumers must be idempotent: by design, via a dedup table in the same transaction, or with idempotency keys.
+- If order matters, key by aggregate ID and version your events.
