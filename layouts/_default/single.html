@@ -4,7 +4,11 @@
 <div class="page-wrap">
     <main class="main main--single">
         <article class="post-detail reveal">
-            <a href="{{ "/" | relURL }}" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to home</a>
+            {{ if eq .Section "posts" }}
+            <a href="{{ "/posts/" | relURL }}" class="back-link"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> All articles</a>
+            {{ else }}
+            <a href="{{ "/" | relURL }}" class="back-link"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to home</a>
+            {{ end }}
 
             <header class="post-detail__header">
                 {{ if .Params.category }}
@@ -13,7 +17,7 @@
                 <h1 class="post-detail__title">{{ .Title }}</h1>
                 <div class="post-detail__meta">
                     {{ if not .Date.IsZero }}
-                        <span class="post-detail__meta-item"><i class="fa-regular fa-calendar"></i> {{ .Date.Format "Jan 2, 2006" }}</span>
+                        <span class="post-detail__meta-item"><i class="fa-regular fa-calendar" aria-hidden="true"></i> <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time></span>
                     {{ end }}
                     <span class="post-detail__meta-item"><i class="fa-regular fa-clock"></i> {{ .ReadingTime }} min read</span>
                 </div>
@@ -21,7 +25,8 @@
 
             {{ if .Params.image }}
                 <div class="post-detail__hero-wrap">
-                    <img src="{{ .Params.image | relURL }}" alt="{{ .Title }}" class="post-detail__hero-img">
+                    {{ $size := partial "image-size.html" .Params.image }}
+                    <img src="{{ .Params.image | relURL }}" alt="{{ .Params.imageAlt | default .Title }}" class="post-detail__hero-img"{{ with $size }} width="{{ .w }}" height="{{ .h }}"{{ end }} fetchpriority="high" decoding="async">
                 </div>
             {{ end }}
 
@@ -29,5 +34,44 @@
                 {{ .Content }}
             </div>
         </article>
+
+        {{ if eq .Section "posts" }}
+        {{ $related := first 3 (where (.Site.RegularPages.Related .) "Section" "posts") }}
+        {{ with $related }}
+        <section class="post-related" aria-labelledby="related-heading">
+            <h2 class="post-related__title" id="related-heading">Related articles</h2>
+            <div class="blog-grid">
+                {{ range . }}
+                <article class="blog-card">
+                    {{ if .Params.image }}
+                    {{ $size := partial "image-size.html" .Params.image }}
+                    <a href="{{ .RelPermalink }}" class="blog-card__visual" tabindex="-1" aria-hidden="true">
+                        <img src="{{ .Params.image | relURL }}" alt="" class="blog-card__img"{{ with $size }} width="{{ .w }}" height="{{ .h }}"{{ end }} loading="lazy" decoding="async">
+                    </a>
+                    {{ end }}
+                    <div class="blog-card__body">
+                        <div class="blog-card__meta">
+                            {{ if .Params.category }}
+                            <span class="blog-card__cat">{{ .Params.category }}</span>
+                            <span class="blog-card__dot" aria-hidden="true">•</span>
+                            {{ end }}
+                            <span class="blog-card__read"><i class="fa-regular fa-clock" aria-hidden="true"></i> {{ .ReadingTime }} min</span>
+                        </div>
+                        <h3 class="blog-card__title">
+                            <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+                        </h3>
+                        <div class="blog-card__footer">
+                            <a href="{{ .RelPermalink }}" class="blog-card__link" tabindex="-1" aria-hidden="true">
+                                <span>Read article</span>
+                                <i class="fa-solid fa-arrow-right-long"></i>
+                            </a>
+                        </div>
+                    </div>
+                </article>
+                {{ end }}
+            </div>
+        </section>
+        {{ end }}
+        {{ end }}
     </main>
 {{ partial "footer.html" . }}

@@ -37,7 +37,8 @@
                     <article class="blog-featured-card" data-category="{{ if $leadPost.Params.category }}{{ $leadPost.Params.category | urlize }}{{ else }}general{{ end }}">
                         {{ if $leadPost.Params.image }}
                         <a href="{{ $leadPost.RelPermalink }}" class="blog-featured-card__visual" aria-label="{{ $leadPost.Title }}">
-                            <img src="{{ $leadPost.Params.image | relURL }}" alt="{{ $leadPost.Title }}" class="blog-featured-card__img" loading="eager">
+                            {{ $size := partial "image-size.html" $leadPost.Params.image }}
+                            <img src="{{ $leadPost.Params.image | relURL }}" alt="{{ $leadPost.Params.imageAlt | default $leadPost.Title }}" class="blog-featured-card__img"{{ with $size }} width="{{ .w }}" height="{{ .h }}"{{ end }} loading="eager" fetchpriority="high" decoding="async">
                             <span class="featured-badge"><i class="fa-solid fa-star"></i> Featured Guide</span>
                         </a>
                         {{ end }}
@@ -47,7 +48,7 @@
                                 <span class="blog-card__cat">{{ $leadPost.Params.category }}</span>
                                 <span class="blog-card__dot" aria-hidden="true">•</span>
                                 {{ end }}
-                                <span class="blog-card__date">{{ $leadPost.Date.Format "Jan 2, 2006" }}</span>
+                                <time class="blog-card__date" datetime="{{ $leadPost.Date.Format "2006-01-02" }}">{{ $leadPost.Date.Format "Jan 2, 2006" }}</time>
                                 <span class="blog-card__dot" aria-hidden="true">•</span>
                                 <span class="blog-card__read"><i class="fa-regular fa-clock"></i> {{ $leadPost.ReadingTime }} min read</span>
                             </div>
@@ -80,7 +81,8 @@
                         <article class="blog-card" data-category="{{ if .Params.category }}{{ .Params.category | urlize }}{{ else }}general{{ end }}">
                             {{ if .Params.image }}
                             <a href="{{ .RelPermalink }}" class="blog-card__visual" aria-label="{{ .Title }}">
-                                <img src="{{ .Params.image | relURL }}" alt="{{ .Title }}" class="blog-card__img" loading="lazy">
+                                {{ $size := partial "image-size.html" .Params.image }}
+                                <img src="{{ .Params.image | relURL }}" alt="{{ .Params.imageAlt | default .Title }}" class="blog-card__img"{{ with $size }} width="{{ .w }}" height="{{ .h }}"{{ end }} loading="lazy" decoding="async">
                                 {{ if .Params.tag }}
                                 <span class="blog-card__topic-tag">{{ .Params.tag }}</span>
                                 {{ end }}
@@ -92,7 +94,7 @@
                                     <span class="blog-card__cat">{{ .Params.category }}</span>
                                     <span class="blog-card__dot" aria-hidden="true">•</span>
                                     {{ end }}
-                                    <span class="blog-card__date">{{ .Date.Format "Jan 2, 2006" }}</span>
+                                    <time class="blog-card__date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "Jan 2, 2006" }}</time>
                                     <span class="blog-card__dot" aria-hidden="true">•</span>
                                     <span class="blog-card__read"><i class="fa-regular fa-clock"></i> {{ .ReadingTime }} min</span>
                                 </div>
