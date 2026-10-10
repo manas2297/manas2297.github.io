@@ -3,7 +3,7 @@ title: "Distributed Drip Rate-Limiter for Event Streams"
 date: 2026-08-03
 category: "Platform Architecture"
 tag: "Distributed Systems"
-image: "img/ratelimit_worker.png"
+image: "img/ratelimit_worker.jpg"
 role: "Platform Engineer"
 scale: "Multi-Tenant Event Pipelines"
 impact: "Zero Dropped Events & Controlled Throttling"

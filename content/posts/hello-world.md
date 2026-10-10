@@ -4,7 +4,7 @@ date: 2026-08-02
 category: "Distributed Systems"
 tag: "Golang & Concurrency"
 tags: ["Go", "Kafka", "Concurrency", "Performance"]
-image: "img/go_event_streams.png"
+image: "img/go_event_streams.jpg"
 featured: true
 description: "A deep dive into optimizing concurrency primitives, batching mechanisms, and channel strategies inside Go Kafka producers."
 ---

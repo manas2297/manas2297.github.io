@@ -7,13 +7,11 @@
 {{ $githubUrl := .Site.Params.social.github | default "https://github.com/manas2297" }}
 {{ $linkedinUrl := .Site.Params.social.linkedin | default "https://www.linkedin.com/in/manas2297" }}
 
+<script>document.documentElement.classList.add('has-depth');</script>
+
 <div class="page-wrap">
     <main class="main">
-        <section class="hero" id="welcome" aria-label="Introduction">
-            <div class="hero__ambient" aria-hidden="true">
-                <span class="hero__orb hero__orb--1"></span>
-                <span class="hero__orb hero__orb--2"></span>
-            </div>
+        <section class="hero" id="welcome" data-route="GET /" aria-label="Introduction">
             <div class="hero__grid">
                 <div class="hero__content">
                     <p class="hero__availability">
@@ -42,15 +40,47 @@
                     </div>
                 </div>
 
-                <div class="hero__visual">
-                    <div class="hero__portrait">
-                        <img src="{{ .Site.Params.hero.portraitSrc | relURL }}" alt="{{ .Site.Params.hero.portraitAlt }}" width="420" height="520" loading="eager">
+                <div class="hero__visual" aria-hidden="true">
+                    <div class="stack" id="stack">
+                        <div class="stack__scene">
+                            <div class="stack__layer" style="--i: 3">
+                                <span class="stack__label">Edge · API gateway</span>
+                                <div class="stack__row">
+                                    <span class="stack__node stack__node--wide"></span>
+                                    <span class="stack__node"></span>
+                                </div>
+                            </div>
+                            <div class="stack__layer" style="--i: 2">
+                                <span class="stack__label">Services · Go / gRPC</span>
+                                <div class="stack__row">
+                                    <span class="stack__node"></span>
+                                    <span class="stack__node"></span>
+                                    <span class="stack__node"></span>
+                                </div>
+                            </div>
+                            <div class="stack__layer stack__layer--bus" style="--i: 1">
+                                <span class="stack__label">Event bus · Kafka</span>
+                                <div class="stack__partitions">
+                                    <span></span><span></span><span></span><span></span>
+                                </div>
+                            </div>
+                            <div class="stack__layer" style="--i: 0">
+                                <span class="stack__label">Storage · Postgres / Redis</span>
+                                <div class="stack__row">
+                                    <span class="stack__node stack__node--db"></span>
+                                    <span class="stack__node stack__node--db"></span>
+                                </div>
+                            </div>
+                            <span class="stack__wire" style="--x: 34%; --y: 56%; --d: 0s"><i></i></span>
+                            <span class="stack__wire" style="--x: 58%; --y: 48%; --d: 1.1s"><i></i></span>
+                            <span class="stack__wire" style="--x: 72%; --y: 60%; --d: 2.2s"><i></i></span>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section class="about scroll-reveal" id="about" aria-labelledby="about-heading">
+        <section class="about scroll-reveal" id="about" data-route="/about" aria-labelledby="about-heading">
             <header class="section-header section-header--compact">
                 <p class="eyebrow">{{ with $about.eyebrow }}{{ . }}{{ else }}About{{ end }}</p>
                 <h2 id="about-heading" class="section-title">{{ with $about.title }}{{ . | safeHTML }}{{ else }}Engineering scale with <span class="text-accent">business impact</span>{{ end }}</h2>
@@ -71,6 +101,9 @@
                     {{ end }}
                 </div>
                 <aside class="about__aside" aria-label="What I help teams with">
+                    <figure class="about__portrait">
+                        <img src="{{ .Site.Params.hero.portraitSrc | relURL }}" alt="{{ .Site.Params.hero.portraitAlt }}" width="720" height="960" loading="lazy">
+                    </figure>
                     <h3 class="about__aside-title">{{ with $about.aside_title }}{{ . }}{{ else }}Where I add value{{ end }}</h3>
                     <ul class="about__list">
                         {{ range ($about.aside_points | default $about.highlights) }}
@@ -81,7 +114,7 @@
             </div>
         </section>
 
-        <section class="experience scroll-reveal" id="experience" aria-labelledby="experience-heading">
+        <section class="experience scroll-reveal" id="experience" data-route="/experience" aria-labelledby="experience-heading">
             <header class="section-header">
                 <p class="eyebrow">{{ with $exp.eyebrow }}{{ . }}{{ else }}Background{{ end }}</p>
                 <h2 id="experience-heading" class="section-title">{{ with $exp.title }}{{ . | safeHTML }}{{ else }}Experience & <span class="text-accent">expertise</span>{{ end }}</h2>
@@ -125,15 +158,16 @@
             {{ end }}
         </section>
 
-        <section class="showcase scroll-reveal" id="works" aria-labelledby="works-heading">
+        <section class="showcase scroll-reveal" id="works" data-route="/works" aria-labelledby="works-heading">
             <header class="section-header">
                 <p class="eyebrow">Case studies</p>
                 <h2 id="works-heading" class="section-title">Work that shows <span class="text-accent">impact</span></h2>
                 <p class="section-lede">Production systems across fintech, healthcare, and platform engineering — with measurable reliability and scale outcomes.</p>
             </header>
 
-            <div class="showcase-grid">
+            <div class="showcase-grid deck" id="deck">
                 {{ range (where .Site.RegularPages "Section" "works") }}
+                <div class="deck__slot">
                 <article class="proj-card">
                     <div class="proj-card__visual">
                         <img src="{{ .Params.image | relURL }}" alt="{{ .Title }}" class="proj-card__img" loading="lazy">
@@ -150,9 +184,11 @@
                         <a href="{{ .RelPermalink }}" class="proj-card__link">Read case study <i class="fa-solid fa-arrow-right-long"></i></a>
                     </div>
                 </article>
+                </div>
                 {{ end }}
 
                 {{ range $featuredProjects }}
+                <div class="deck__slot">
                 <article class="proj-card">
                     <div class="proj-card__visual">
                         <img src="{{ .image | relURL }}" alt="{{ .title }}" class="proj-card__img" loading="lazy">
@@ -169,11 +205,12 @@
                         <a href="{{ .link }}" {{ if hasPrefix .link "http" }}target="_blank" rel="noopener noreferrer"{{ end }} class="proj-card__link">{{ .link_text | default "View repository" }} <i class="fa-solid fa-arrow-right-long"></i></a>
                     </div>
                 </article>
+                </div>
                 {{ end }}
             </div>
         </section>
 
-        <section class="contact scroll-reveal" id="contact" aria-labelledby="contact-heading">
+        <section class="contact scroll-reveal" id="contact" data-route="200 OK" aria-labelledby="contact-heading">
             <div class="contact__panel">
                 <header class="contact__header">
                     <p class="eyebrow">{{ .Site.Params.contact.eyebrow }}</p>
@@ -196,4 +233,15 @@
             </div>
         </section>
     </main>
+<script src="{{ "js/depth.js" | relURL }}?v=1.1" defer></script>
+<script src="{{ "js/works-motion.js" | relURL }}?v=1.0" defer></script>
+<script type="importmap">
+    {
+        "imports": {
+            "three": "{{ "vendor/three/build/three.module.min.js" | relURL }}",
+            "three/addons/": "{{ "vendor/three/addons/" | relURL }}"
+        }
+    }
+</script>
+<script type="module" src="{{ "js/stack3d.js" | relURL }}?v=1.0"></script>
 {{ partial "footer.html" . }}

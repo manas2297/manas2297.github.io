@@ -32,7 +32,8 @@
         gap: 0.25rem;
         background: var(--bg-alt);
         border-left: 1px solid var(--border);
-        transform: translateX(100%);
+        /* The header's backdrop-filter makes it the containing block, so push past its side padding too. */
+        transform: translateX(calc(100% + 2rem));
         transition: transform 0.25s ease;
         z-index: 95;
     }

@@ -4,7 +4,7 @@ date: 2026-08-18
 category: "Platform Engineering"
 tag: "Architecture & Scale"
 tags: ["Redis", "Distributed Systems", "Locks", "Kubernetes"]
-image: "img/redis_locks.png"
+image: "img/redis_locks.jpg"
 featured: false
 description: "Why standard mutexes break in Kubernetes clusters, and how fine-grained Redis locks and atomic Lua scripts prevent multi-pod race conditions."
 ---

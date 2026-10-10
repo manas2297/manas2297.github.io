@@ -3,7 +3,7 @@ title: "Zero-Downtime Cross-Region Kafka Migration"
 date: 2026-08-01
 category: "Platform Case Study"
 tag: "Distributed Systems"
-image: "img/kafka_migration.png"
+image: "img/kafka_migration.jpg"
 role: "Platform Engineer"
 scale: "15M+ Users"
 impact: "250ms → < 10ms Latency"

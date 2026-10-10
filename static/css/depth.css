@@ -1,0 +1,394 @@
+/* ==========================================================================
+   DEPTH & SCROLL-DRAWN CURVES (home page)
+   Hero architecture stack, request-path spine, experience rail fill,
+   and perspective transforms on cards. Driven by js/depth.js.
+   ========================================================================== */
+
+/* ── Hero: isometric architecture stack ── */
+.stack {
+    position: relative;
+    height: 440px;
+    display: grid;
+    place-items: center;
+    perspective: 1600px;
+}
+
+.stack__scene {
+    --gap: 64px;
+    --tilt-x: 0deg;
+    --tilt-z: 0deg;
+    position: relative;
+    width: 290px;
+    height: 290px;
+    transform-style: preserve-3d;
+    transform: translateY(calc(var(--gap) * 1.2)) rotateX(calc(58deg + var(--tilt-x))) rotateZ(calc(-42deg + var(--tilt-z)));
+}
+
+.stack__layer {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 14px;
+    padding: 20px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid var(--border-hover);
+    box-shadow: 0 40px 50px -30px rgba(20, 23, 28, 0.35);
+    transform: translateZ(calc(var(--i) * var(--gap)));
+}
+
+.stack__layer--bus {
+    background: rgba(239, 243, 253, 0.94);
+    border-color: var(--accent-muted);
+}
+
+.stack__label {
+    font: 500 11px/1 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+}
+
+.stack__layer--bus .stack__label {
+    color: var(--accent);
+}
+
+.stack__row {
+    flex: 1;
+    display: flex;
+    gap: 10px;
+}
+
+.stack__node {
+    flex: 1;
+    border-radius: 10px;
+    border: 1px solid var(--border-hover);
+    background:
+        linear-gradient(var(--border) 0 0) 12px 14px / 40% 3px no-repeat,
+        linear-gradient(var(--border) 0 0) 12px 24px / 25% 3px no-repeat,
+        var(--bg);
+}
+
+.stack__node--wide {
+    flex: 2;
+}
+
+.stack__node--db {
+    border-radius: 50% / 22%;
+    border-color: var(--accent-muted);
+}
+
+.stack__partitions {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.stack__partitions span {
+    height: 12px;
+    border-radius: 3px;
+    background: repeating-linear-gradient(90deg, var(--accent-muted) 0 16px, transparent 16px 20px);
+    background-size: 20px 100%;
+    animation: stack-append 2.4s linear infinite;
+}
+
+.stack__partitions span:nth-child(2) { animation-duration: 3.1s; }
+.stack__partitions span:nth-child(3) { animation-duration: 2.7s; }
+.stack__partitions span:nth-child(4) { animation-duration: 3.6s; }
+
+@keyframes stack-append {
+    to { background-position: 20px 0; }
+}
+
+/* A wire hangs from the top layer to storage; a request travels down it. */
+.stack__wire {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: 2px;
+    height: calc(var(--gap) * 3);
+    transform-origin: top center;
+    transform: translateZ(calc(var(--gap) * 3)) rotateX(-90deg);
+    background: repeating-linear-gradient(var(--accent-muted) 0 4px, transparent 4px 8px);
+}
+
+.stack__wire i {
+    position: absolute;
+    left: -3px;
+    top: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-light);
+    animation: stack-request 3.3s cubic-bezier(0.45, 0, 0.55, 1) var(--d) infinite;
+}
+
+@keyframes stack-request {
+    0% { top: 0; opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+}
+
+/* ── Three.js version of the stack (js/stack3d.js) ── */
+.stack__canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+}
+
+.stack.is-3d .stack__canvas {
+    display: block;
+}
+
+.stack.is-3d .stack__scene {
+    display: none;
+}
+
+.stack__tags {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.stack__tag {
+    position: absolute;
+    top: 0.5rem;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    padding-left: 14px;
+    width: 220px;
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.stack__tag::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.45rem;
+    width: 8px;
+    height: 1px;
+    background: var(--accent);
+}
+
+.stack__tag.is-active {
+    opacity: 1;
+    transform: none;
+}
+
+.stack__tag-name {
+    font: 500 11px/1.2 var(--font-mono);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+    transition: color 0.3s ease;
+}
+
+.stack__tag-metric {
+    font: 500 13px/1.3 var(--font-sans);
+    color: var(--accent);
+}
+
+.stack__tag.is-active .stack__tag-name {
+    color: var(--text-heading);
+}
+
+/* ── Request-path spine drawn as you scroll ── */
+.has-depth .main {
+    position: relative;
+}
+
+.has-depth .main > section {
+    position: relative;
+    z-index: 1;
+}
+
+.spine {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.spine__track {
+    fill: none;
+    stroke: var(--border-hover);
+    stroke-width: 1.5;
+    stroke-dasharray: 2 6;
+    stroke-linecap: round;
+}
+
+.spine__path {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 2;
+    stroke-linecap: round;
+}
+
+.spine__node {
+    fill: var(--bg);
+    stroke: var(--border-hover);
+    stroke-width: 1.5;
+    transition: fill 0.3s ease, stroke 0.3s ease;
+}
+
+.spine__node.is-reached {
+    fill: var(--accent);
+    stroke: var(--accent);
+}
+
+.spine__label {
+    font: 500 11px var(--font-mono);
+    letter-spacing: 0.04em;
+    fill: var(--subtle);
+    transition: fill 0.3s ease;
+}
+
+.spine__label.is-reached {
+    fill: var(--text-heading);
+}
+
+.spine__head {
+    fill: var(--accent);
+}
+
+.spine__halo {
+    fill: var(--accent);
+    opacity: 0.15;
+}
+
+.spine-compact .main {
+    padding-left: 2.6rem;
+}
+
+/* ── Experience: the rail fills role by role ── */
+.has-depth .journey__list::after {
+    content: '';
+    position: absolute;
+    left: 139px;
+    top: 8px;
+    width: 2px;
+    height: calc((100% - 16px) * var(--fill, 0));
+    background: var(--accent);
+    border-radius: 2px;
+}
+
+.has-depth .journey-item__content::before {
+    background: var(--bg);
+    border: 2px solid var(--border-hover);
+    box-shadow: none;
+    transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.has-depth .journey-item.is-reached .journey-item__content::before {
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-light);
+}
+
+/* ── Cards and panels get perspective from depth.js ── */
+.has-depth .journey-item,
+.has-depth .about__copy,
+.has-depth .about__aside,
+.has-depth .expertise,
+.has-depth .contact__panel {
+    transform-origin: 50% 100%;
+    will-change: transform;
+}
+
+.about__portrait {
+    margin: 0 0 1.25rem;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    aspect-ratio: 4 / 5;
+    max-height: 340px;
+}
+
+.about__portrait img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 30%;
+}
+
+.has-depth .main > section + section {
+    margin-top: 12vh;
+}
+
+@media (max-width: 900px) {
+    .hero__visual {
+        order: 0;
+        max-width: none;
+        margin: 0;
+    }
+
+    .stack {
+        height: 400px;
+    }
+
+    .stack__tag {
+        top: auto;
+        bottom: 0;
+    }
+
+    .stack__scene {
+        --gap: 50px;
+        width: 220px;
+        height: 220px;
+    }
+
+    .stack__layer {
+        padding: 14px;
+        gap: 10px;
+    }
+
+    .stack__label {
+        font-size: 9px;
+    }
+
+    .has-depth .main > section + section {
+        margin-top: 8vh;
+    }
+}
+
+@media (max-width: 640px) {
+    .has-depth .journey__list::after {
+        left: 5px;
+        top: 6px;
+        height: calc((100% - 12px) * var(--fill, 0));
+    }
+
+    .has-depth .journey-item::before {
+        background: var(--bg);
+        border: 2px solid var(--border-hover);
+        box-shadow: none;
+        transition: background 0.3s ease, border-color 0.3s ease;
+    }
+
+    .has-depth .journey-item.is-reached::before {
+        background: var(--accent);
+        border-color: var(--accent);
+        box-shadow: 0 0 0 4px var(--accent-light);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .stack__partitions span,
+    .stack__wire i {
+        animation: none;
+    }
+}

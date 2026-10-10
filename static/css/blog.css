@@ -542,7 +542,11 @@
 .post-detail__content code {
     font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', Courier, monospace;
     font-size: 0.92rem;
-    color: #38bdf8;
+    color: var(--accent);
+}
+
+.post-detail__content pre code {
+    color: inherit;
 }
 
 /* Responsive adjustments */
