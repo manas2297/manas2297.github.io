@@ -10,7 +10,7 @@ title = 'Manas Yadav'
     codeFences = true
     guessSyntax = true
     lineNos = false
-    style = 'monokai' # Beautiful default code highlighter theme
+    style = 'github' # light theme to match the site's light code blocks
 
 [params]
   description = 'Professional portfolio for Manas Yadav: distributed systems, cloud infrastructure, and enterprise architecture case studies.'

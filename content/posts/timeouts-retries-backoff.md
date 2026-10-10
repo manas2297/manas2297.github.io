@@ -1,0 +1,130 @@
+---
+title: "Timeouts, Retries, and Backoff: How to Call Other Services Without Causing an Outage"
+date: 2026-10-04
+category: "Reliability"
+tag: "Resilience Patterns"
+tags: ["Reliability", "Microservices", "Go", "Retries", "Circuit Breaker"]
+image: "img/blog/timeouts-retries-backoff.jpg"
+featured: false
+description: "How to set timeouts from real latency data, propagate deadlines, retry with exponential backoff and jitter, cap retries with budgets, and avoid the retry storms that turn a small blip into a full outage."
+---
+
+Every network call your service makes can fail in three ways: it errors quickly, it errors slowly, or it never comes back. The first is easy. The other two are where outages come from. A missing timeout ties up resources until the process runs out of them. A naive retry turns one struggling dependency into a dependency that's being hit three times harder while it's down.
+
+Timeouts and retries are some of the most copy-pasted code in any backend. They're also some of the most dangerous to get wrong. Here's how I think about them.
+
+## Every call needs a timeout
+
+The default in many HTTP clients is no timeout at all. In Go, a zero-value `http.Client{}` will wait forever. So the first rule is simple: never make a network call without a deadline.
+
+```go
+var client = &http.Client{
+	Timeout: 2 * time.Second, // hard upper bound for the whole request
+}
+
+func GetUser(ctx context.Context, id string) (*User, error) {
+	ctx, cancel := context.WithTimeout(ctx, 300*time.Millisecond)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, userURL(id), nil)
+	if err != nil {
+		return nil, err
+	}
+	resp, err := client.Do(req)
+	// ...
+}
+```
+
+The same applies to database queries, Redis calls, and Kafka produce calls. Anything that crosses a network.
+
+## Pick timeouts from data, not round numbers
+
+"Five seconds feels safe" is how most timeouts are chosen. It's usually wrong in both directions: too long to protect you, and not tied to what the dependency actually does.
+
+A better starting point:
+
+1. Look at the dependency's latency distribution under normal load.
+2. Set the timeout a bit above its p99 or p99.9. If p99 is 80ms, a 250 to 300ms timeout catches genuinely stuck calls without cutting off normal slow ones.
+3. Check it against your own latency budget. If your endpoint promises 500ms and calls three services in sequence, they can't each have a 1-second timeout.
+
+## Propagate deadlines
+
+Timeouts set independently at each hop don't add up correctly. Say service A has a 1-second budget and calls B, which calls C with its own 2-second timeout. A gives up after 1 second, but C keeps working for another second on a request nobody is waiting for anymore.
+
+**Deadline propagation** fixes this. Pass the remaining time along with the request, and have every hop respect it. In Go this happens naturally if you pass the incoming request's `context.Context` all the way down instead of creating fresh ones from `context.Background()`. gRPC propagates deadlines across services automatically. For HTTP, you can send the remaining budget in a header and have the callee build its context from it.
+
+A useful extra: if the remaining deadline is already shorter than the minimum time a call could take, fail fast instead of starting work that can't finish.
+
+## Only retry what's safe to retry
+
+Before adding retries, ask two questions.
+
+**Is the operation idempotent?** Retrying a `GET` is safe. Retrying "charge this card" without an idempotency key can charge it twice. A timeout doesn't tell you whether the request failed, only that you didn't get an answer. The server might have done the work. (I cover idempotency keys in the [outbox and idempotent consumers](/posts/transactional-outbox-idempotent-consumers/) post.)
+
+**Is the error retryable?** Retry on connection errors, timeouts, `503`, and `429` (respecting `Retry-After`). Don't retry `400`, `401`, `404`, or validation errors. They'll fail the same way every time.
+
+## Exponential backoff with jitter
+
+Retrying immediately just adds load to a dependency that's already struggling. Retrying at fixed intervals is a bit better, but if a thousand clients failed at the same moment, they'll all retry at the same moment too. You've created a synchronized wave.
+
+The standard fix is **exponential backoff with jitter**: wait longer after each attempt, and randomize the wait so clients spread out.
+
+```go
+func backoff(attempt int, base, max time.Duration) time.Duration {
+	d := base << attempt // base * 2^attempt
+	if d > max || d <= 0 {
+		d = max
+	}
+	return time.Duration(rand.Int64N(int64(d))) // "full jitter": random in [0, d)
+}
+
+func withRetry(ctx context.Context, attempts int, fn func(context.Context) error) error {
+	var err error
+	for i := 0; i < attempts; i++ {
+		if err = fn(ctx); err == nil || !retryable(err) {
+			return err
+		}
+		select {
+		case <-time.After(backoff(i, 50*time.Millisecond, 2*time.Second)):
+		case <-ctx.Done():
+			return ctx.Err()
+		}
+	}
+	return err
+}
+```
+
+"Full jitter" picks a random wait between zero and the exponential cap. It looks odd at first, because some retries happen almost immediately, but AWS's well-known analysis of backoff strategies found it spreads load out far better than adding a little noise to a fixed schedule.
+
+Keep the attempt count small. Two or three total attempts is plenty for most calls.
+
+## Retries multiply across layers
+
+This is the part that causes real outages. Suppose a request passes through three services, and each one tries up to 3 times. When the bottom service fails, the middle one tries 3 times, and the top one retries the middle one 3 times. That's 3 × 3 × 3 = **27 attempts** hitting the bottom service for every one user request. Just as it's struggling to recover.
+
+Ways to keep this under control:
+
+- **Retry at one layer only.** Usually the one closest to the user or the one that knows the operation is safe. Inner layers fail fast.
+- **Use a retry budget.** Allow retries only while they're a small fraction of total traffic, say 10%. When a dependency is really down, retries stop automatically instead of tripling load. gRPC's retry throttling works this way.
+- **Respect the deadline.** With deadline propagation, retries stop on their own when the time is gone.
+
+## Circuit breakers
+
+A circuit breaker tracks recent failures to a dependency. When the failure rate crosses a threshold, it **opens** and fails calls immediately without sending them, for a cool-down period. Then it lets a few trial requests through (**half-open**). If they succeed, it closes again.
+
+It protects both sides. Your service stops wasting threads, connections, and latency budget on calls that will fail. The dependency gets breathing room to recover. Pair it with a fallback where one makes sense: a cached value, a default, or a degraded response.
+
+## Hedged requests for tail latency
+
+For idempotent reads, there's one more tool. If a request hasn't come back by roughly the dependency's p95, send a second copy to another replica and use whichever answers first. Google's "The Tail at Scale" paper describes this technique. It can cut tail latency sharply for a small increase in load. Only hedge reads that are safe to duplicate, and cap how many hedges you send.
+
+## Checklist
+
+- Every network call has a timeout, set from the dependency's real latency.
+- Deadlines propagate through the call chain via context.
+- Only idempotent operations, and only retryable errors, get retried.
+- Retries use exponential backoff with full jitter and a small attempt count.
+- Retries happen at one layer, under a budget.
+- Circuit breakers guard dependencies that can fail hard.
+
+Timeouts and retries protect you from *other* services. The companion problem is protecting your own service from too much incoming work, which I cover in [backpressure and load shedding](/posts/backpressure-load-shedding-services/).

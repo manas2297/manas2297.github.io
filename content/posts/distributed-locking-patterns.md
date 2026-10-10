@@ -3,38 +3,111 @@ title: "Distributed Locking Patterns in High-Concurrency Microservices"
 date: 2026-08-18
 category: "Platform Engineering"
 tag: "Architecture & Scale"
-tags: ["Redis", "Distributed Systems", "Locks", "Kubernetes"]
+tags: ["Redis", "PostgreSQL", "Distributed Systems", "Locks", "Kubernetes"]
 image: "img/redis_locks.jpg"
 featured: false
-description: "Why standard mutexes break in Kubernetes clusters, and how fine-grained Redis locks and atomic Lua scripts prevent multi-pod race conditions."
+description: "Why sync.Mutex stops working once you scale out, how to build a safe Redis lock with tokens and atomic release, why fencing tokens matter, and when you don't need a lock at all."
 ---
 
-When scaling microservices horizontally across dozens of Kubernetes pods, in-memory concurrency controls (`sync.Mutex` in Go or standard thread locks) only protect memory within a single container. As soon as multiple pods consume from the same event topic or share a database table, distributed race conditions emerge.
+A `sync.Mutex` protects memory inside one process. The moment you run three replicas of a service on Kubernetes, each pod has its own mutex, and they know nothing about each other. If two pods pick up work for the same customer at the same time, the mutex does nothing to stop them.
 
-## The Pitfalls of Simple Distributed Locks
+That's when people reach for a distributed lock. Distributed locks are useful, but they're also one of the easiest things in backend engineering to get subtly wrong. This post covers the failure modes, a Redis lock that handles the common ones, and the cases where a lock is the wrong tool.
 
-A common approach is using a basic Redis `SET key value NX PX milliseconds` command. While effective for simple lock-and-release flows, real-world distributed architectures often run into three edge cases:
+## The three ways a simple lock breaks
 
-1. **Lock Expiry Before Work Completes**: If a downstream database query or third-party call takes longer than the lock's TTL, the lock expires silently. Another pod acquires the lock, leading to split-brain execution.
-2. **Releasing Another Pod's Lock**: If Pod A gets delayed by a JVM/Go GC pause, its lock expires, and Pod B acquires it. When Pod A wakes up and executes `DEL key`, it deletes Pod B's lock!
-3. **Lock Contention Under Traffic Spikes**: If hundreds of pods hammer Redis attempting to acquire the same entity lock, network latency and Redis CPU spike.
+The usual first attempt is `SET lock:key 1 NX PX 30000`: set the key only if it doesn't exist, with a 30-second expiry. Then do the work and `DEL` the key. It looks fine. Here's what goes wrong.
 
-## Atomic Evaluation via Redis Lua Scripts
+1. **The lock expires before the work finishes.** A slow database query, a retrying HTTP call, or a long GC pause pushes the work past 30 seconds. The key expires. Another pod acquires the lock. Now two pods are doing the "exclusive" work at the same time.
+2. **You delete someone else's lock.** Pod A's lock expires, Pod B acquires it, then Pod A finishes and runs `DEL`. It just released Pod B's lock, and Pod C can walk right in.
+3. **Everyone hammers Redis at once.** If hundreds of workers spin on the same lock with tight retry loops, you get a thundering herd. Redis CPU and network spike, and the lock becomes the bottleneck it was supposed to protect.
 
-Instead of a multi-roundtrip lock-work-release loop, executing critical checks inside an **atomic Redis Lua script** evaluates conditions and updates counters in a single round-trip without acquiring long-lived locks:
+## A lock that handles the basics
 
-```lua
--- Atomic check and conditional increment
-local current = redis.call('GET', KEYS[1])
-if not current or tonumber(current) < tonumber(ARGV[1]) then
-    redis.call('INCR', KEYS[1])
-    if not current then
-        redis.call('EXPIRE', KEYS[1], ARGV[2])
-    end
-    return 1
-else
-    return 0
+Fixing the second problem is straightforward: store a unique token as the value, and only delete the key if it still holds *your* token. The check and the delete must be atomic, which is what a Lua script gives you.
+
+```go
+var release = redis.NewScript(`
+if redis.call("GET", KEYS[1]) == ARGV[1] then
+	return redis.call("DEL", KEYS[1])
 end
+return 0
+`)
+
+func Acquire(ctx context.Context, rdb *redis.Client, key string, ttl time.Duration) (string, bool, error) {
+	token := uuid.NewString()
+	ok, err := rdb.SetNX(ctx, key, token, ttl).Result()
+	return token, ok, err
+}
+
+func Release(ctx context.Context, rdb *redis.Client, key, token string) error {
+	return release.Run(ctx, rdb, []string{key}, token).Err()
+}
 ```
 
-By keeping lock scopes tightly granular (e.g. `lock:tenant_123:payout` rather than a global lock), thousands of tenants run completely parallel without contention.
+For the first problem, you have two levers:
+
+- **Size the TTL to the work.** Set it comfortably above your p99 for the critical section, not your average.
+- **Extend the lease while working.** A background goroutine can refresh the TTL every `ttl/3`, using the same compare-the-token pattern so it never extends a lock it no longer owns. If a refresh fails, cancel the work's context.
+
+For the third, add jittered backoff to acquisition retries, and keep locks fine-grained. `lock:tenant_123:payout` lets thousands of tenants run in parallel. A global `lock:payouts` serializes the whole system.
+
+## Leases alone are not enough: fencing tokens
+
+Here's the uncomfortable part. Even with tokens and lease extension, a lock in Redis can't fully protect you. Imagine Pod A acquires the lock, then freezes for 40 seconds in a stop-the-world pause or a network partition. The lease expires, Pod B takes over and writes to the database. Then Pod A wakes up, has no idea time has passed, and writes too.
+
+No amount of client-side care fixes this, because Pod A *can't know* it was paused. The fix has to live in the resource being protected. Martin Kleppmann's well-known critique of Redlock describes the standard answer: **fencing tokens**.
+
+Every time the lock is granted, hand out a number that only ever goes up. The storage layer remembers the highest token it has seen and rejects writes with an older one:
+
+```sql
+UPDATE payouts
+SET    status = $1, fence = $2
+WHERE  id = $3 AND fence < $2;
+```
+
+If Pod A shows up late with token 33 after Pod B already wrote with token 34, the update affects zero rows. You can generate the token with `INCR` on a Redis key at acquisition time, or use a database sequence.
+
+## Sometimes you don't need a lock
+
+A lot of "we need a distributed lock" problems are really "we need an atomic operation." If the decision fits in a single round trip, do it in one place and skip the lock entirely.
+
+A Lua script runs atomically in Redis, so this counter enforces a limit with no lock at all:
+
+```lua
+-- KEYS[1] = counter key, ARGV[1] = limit, ARGV[2] = ttl seconds
+local current = tonumber(redis.call('GET', KEYS[1]) or '0')
+if current >= tonumber(ARGV[1]) then
+  return 0
+end
+current = redis.call('INCR', KEYS[1])
+if current == 1 then
+  redis.call('EXPIRE', KEYS[1], ARGV[2])
+end
+return 1
+```
+
+The same idea applies in PostgreSQL. A conditional `UPDATE ... WHERE balance >= $1` or an `INSERT ... ON CONFLICT DO NOTHING` often replaces a lock completely, and the database's own concurrency control does the work.
+
+## When the data already lives in Postgres
+
+If the thing you're protecting is a row in PostgreSQL, you may not need Redis in the loop at all. Postgres has advisory locks:
+
+```sql
+-- returns true if acquired; released automatically at transaction end
+SELECT pg_try_advisory_xact_lock(hashtext('payout:tenant_123'));
+```
+
+Transaction-scoped advisory locks can't leak, because they're released when the transaction ends, even if the client crashes. And for work-queue patterns, `SELECT ... FOR UPDATE SKIP LOCKED` lets many workers pull distinct rows without stepping on each other.
+
+## Picking the right tool
+
+| Situation | Reach for |
+|---|---|
+| Decision fits in one atomic step | Lua script, conditional `UPDATE`, unique constraint |
+| Protected data lives in Postgres | Advisory lock or `SELECT ... FOR UPDATE SKIP LOCKED` |
+| Cross-service, efficiency only (duplicate work is wasteful, not dangerous) | Redis lock with token and TTL |
+| Correctness matters (duplicate work corrupts data) | Lock **plus** fencing tokens checked by the storage layer |
+
+The question to ask before adding any lock: what happens if two holders run at once? If the answer is "we do some work twice," a simple lease is fine. If the answer is "we pay someone twice," you need fencing, or a design where the database enforces the invariant for you.
+
+For more on making duplicate work harmless in the first place, see [idempotency and the transactional outbox pattern](/posts/transactional-outbox-idempotent-consumers/).
